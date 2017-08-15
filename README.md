@@ -3,7 +3,7 @@ COMP30022
 
 TASKS TO COMPLETE (15/08)
 
-[] Combine Client/Server Repo's to Zenhub Board
+[ ] Combine Client/Server Repo's to Zenhub Board
 
 [] For all features/issues in repo add: Descriptions
 
