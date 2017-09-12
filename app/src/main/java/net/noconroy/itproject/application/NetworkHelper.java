@@ -4,10 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -18,6 +23,9 @@ import okhttp3.Response;
  */
 
 public final class NetworkHelper {
+    private static final String SERVER_SCHEME = "http";
+    private static final String SERVER_HOST = "127.0.0.1";
+    private static final Integer SERVER_PORT = 5000;
     private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
     private static final String USER_LOGIN = "/user/login";
     private static final String USER_LOGOUT = "/user/logout";
@@ -91,13 +99,34 @@ public final class NetworkHelper {
     }
 
     // TODO: Unit test fails unauthorised, check
-    public static String Logout(String access_token) {
+    public static String Logout(String access_token, String username) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + USER_LOGOUT;
+        final MediaType JSON
+                = MediaType.parse("Content-Type: application/json");
 
-        RequestBody body = new FormBody.Builder()
-                .add("access_token", access_token)
+
+        // Create a string in the JSON format
+        String json = null;
+        try {
+            json = new JSONObject()
+                    .put("username", username)
+                    .toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        RequestBody body = RequestBody.create(JSON, json);
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = access_token.replaceAll("^\"|\"$", "");
+
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(USER_LOGOUT)
+                .addQueryParameter("access_token", access_token)
                 .build();
 
         Request request = new Request.Builder()
