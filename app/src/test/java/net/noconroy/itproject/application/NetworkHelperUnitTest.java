@@ -1,5 +1,6 @@
 package net.noconroy.itproject.application;
 
+import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -39,8 +40,11 @@ public class NetworkHelperUnitTest {
         NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
 
         String access_token = NetworkHelper.Login(username, "test_password");
-        if (access_token.equals("401")) throw new AssertionError();
-        if (access_token.equals("500")) throw new AssertionError();
+        System.out.println(access_token);
+
+        // Checks for whitespaces in access_token, which usually occers if the server is offline
+        if (access_token.matches(".*\\s+.*")) throw new AssertionError("Most likely server offline");
+        if (!access_token.matches(".*[a-z].*")) throw new AssumptionViolatedException("Most likely HTTP error");
     }
 
     // Tests below here assume Register and Login works
