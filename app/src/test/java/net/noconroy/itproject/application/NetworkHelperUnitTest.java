@@ -27,8 +27,8 @@ public class NetworkHelperUnitTest {
             throw new AssertionError();
 
         // Try to register again
-        if (!Register(username, "test_password", "test_avatar_url", "test_description").equals("500"))
-            throw new AssertionError("You're most likely trying to register a username that already exists");
+        if (!Register(username, "test_password", "test_avatar_url", "test_description").equals("409"))
+            throw new AssertionError();
     }
 
     // This test assume RegisterTest is functioning correctly
@@ -75,9 +75,9 @@ public class NetworkHelperUnitTest {
         // Will return error if logout works as planned
         if (NetworkHelper.Logout(access_token, username).equals("200")) throw new AssertionError();
 
-        // Will return an error if the server doesn't correctly return internal error (500) when
+        // Will return an error if the server doesn't correctly return unauthorised (401) when
         // logout is attempted again
-        if (!NetworkHelper.Logout(access_token, username).equals("500")) throw new AssertionError();
+        if (!NetworkHelper.Logout(access_token, username).equals("401")) throw new AssertionError();
     }
 
     @Test
