@@ -40,7 +40,8 @@ public final class NetworkHelper {
     private static final String FRIEND_REMOVE = "/friends/remove";
     private static final String FRIEND_REQUESTS_IN = "/friends/requests/in";
     private static final String FRIEND_REQUESTS_OUT = "/friends/requests/out";
-    private static final String LOCATION = "/location";
+    private static final String LOCATION = "location/";
+
 
     public static String Register(String username, String password, String avatar_url, String description) {
         final OkHttpClient client = new OkHttpClient();
@@ -204,6 +205,7 @@ public final class NetworkHelper {
         }
     }
 
+    // TODO: Username needed as a paramater
     public static String GetProfile(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
@@ -236,7 +238,6 @@ public final class NetworkHelper {
         try {
             // Extract description from JSON String
             JSONObject jsonobject = new JSONObject(jsonData);
-            System.out.println(jsonobject);
             return jsonobject.getString("description");
 
         } catch (JSONException e) {
@@ -249,15 +250,32 @@ public final class NetworkHelper {
     public static String UpdateLocation(String username, String lat, String lon, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + LOCATION + username;
+        // Create a string in the JSON format
+        String json = null;
+        try {
+            json = new JSONObject()
+                    .put("lat", lat)
+                    .put("lon", lon)
+                    .toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        RequestBody body = new FormBody.Builder()
-                .add("lat", lat)
-                .add("lon", lon)
-                .add("access_token", access_token)
+        RequestBody body = RequestBody.create(JSON, json);
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = access_token.replaceAll("^\"|\"$", "");
+
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(LOCATION + username)
+                .addQueryParameter("access_token", access_token)
                 .build();
 
         Request request = new Request.Builder()
+                .addHeader(JSON_HEADER_NAME, JSON_HEADER_VALUE)
                 .url(url)
                 .post(body)
                 .build();
@@ -272,8 +290,49 @@ public final class NetworkHelper {
         }
     }
 
-    public static String RetrieveLocation(String username, String access_token) {
-        return "200";
+    public static String[] RetrieveLocation(String username, String access_token) {
+        final OkHttpClient client = new OkHttpClient();
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = access_token.replaceAll("^\"|\"$", "");
+
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(LOCATION + username)
+                .addQueryParameter("access_token", access_token)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Call call = client.newCall(request);
+        String jsonData = null;
+        try {
+            Response response = call.execute();
+
+            // Raw JSON data below in String format
+            jsonData = response.body().string();
+
+        }  catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            // Extract description from JSON String
+            JSONObject jsonobject = new JSONObject(jsonData);
+            System.out.println(jsonobject);
+            // Note that optString is used here, so could return ""
+            String dist = jsonobject.optString("distance");
+            String dir = jsonobject.optString("direction");
+            return new String[] {dist, dir};
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // Should never reach here
+        return null;
     }
 
     public static String AddFriend(String username, String access_token) {

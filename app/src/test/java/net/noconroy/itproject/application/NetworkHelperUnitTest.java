@@ -117,6 +117,63 @@ public class NetworkHelperUnitTest {
         if (!NetworkHelper.GetProfile(username, access_token).equals("test_description2")) throw new AssertionError();
     }
 
+    // Tests that the server accepts the request
+    @Test
+    public void UpdateLocationTest() throws Exception {
+        // Register and Login first
+        String username = UUID.randomUUID().toString();
+        NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
+        String access_token = NetworkHelper.Login(username, "test_password");
+
+        if (!NetworkHelper.UpdateLocation(username, "10", "15", access_token).equals("200"))
+            throw new AssertionError();
+    }
+
+    // Test to make sure server returns error if invalid lat/lon inputted
+    @Test
+    public void InvalidUpdateLocation() throws Exception {
+        // Register and Login first
+        String username = UUID.randomUUID().toString();
+        NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
+        String access_token = NetworkHelper.Login(username, "test_password");
+
+        if (!NetworkHelper.UpdateLocation(username, "??", "15", access_token).equals("400"))
+            throw new AssertionError();
+
+        if (!NetworkHelper.UpdateLocation(username, "sdad", "15", access_token).equals("400"))
+            throw new AssertionError();
+
+        if (!NetworkHelper.UpdateLocation(username, "10", "??", access_token).equals("400"))
+            throw new AssertionError();
+
+        if (!NetworkHelper.UpdateLocation(username, "10", "sdad", access_token).equals("400"))
+            throw new AssertionError();
+
+        if (!NetworkHelper.UpdateLocation(username, " ", "sdad", access_token).equals("400"))
+            throw new AssertionError();
+
+        if (!NetworkHelper.UpdateLocation(username, "10", " ", access_token).equals("400"))
+            throw new AssertionError();
+    }
+
+    // Obviously assumes update location works, as that needs to be called in order
+    // to initialize the the location. Only functions for default direction, distance
+    // being returned so far
+    @Test
+    public void GetLocationTest() throws Exception {
+        // Register and Login first
+        String username = UUID.randomUUID().toString();
+        NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
+        String access_token = NetworkHelper.Login(username, "test_password");
+
+        NetworkHelper.UpdateLocation(username, "10", "15", access_token).equals("400");
+
+        if (!NetworkHelper.RetrieveLocation(username, access_token)[0].equals("0.0"))
+            throw new AssertionError();
+        if (!NetworkHelper.RetrieveLocation(username, access_token)[1].equals("180.0"))
+            throw new AssertionError();
+    }
+
 }
 
 
