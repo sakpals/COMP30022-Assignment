@@ -5,8 +5,6 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static net.noconroy.itproject.application.NetworkHelper.Register;
-
 public class NetworkHelperUnitTest {
 
     // TODO: Check tht the username is valid - check if white space works
@@ -15,7 +13,7 @@ public class NetworkHelperUnitTest {
     @Test
     public void RegisterTest() throws Exception {
         String username = UUID.randomUUID().toString();
-        if (!Register(username, "test_password", "test_avatar_url", "test_description").equals("201"))
+        if (!NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description").equals("201"))
             throw new AssertionError();
     }
 
@@ -23,11 +21,11 @@ public class NetworkHelperUnitTest {
     @Test
     public void RegisterTwiceTest() throws Exception {
         String username = UUID.randomUUID().toString();
-        if (!Register(username, "test_password", "test_avatar_url", "test_description").equals("201"))
+        if (!NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description").equals("201"))
             throw new AssertionError();
 
         // Try to register again
-        if (!Register(username, "test_password", "test_avatar_url", "test_description").equals("409"))
+        if (!NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description").equals("409"))
             throw new AssertionError();
     }
 
