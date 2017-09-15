@@ -236,7 +236,6 @@ public final class NetworkHelper {
         try {
             // Extract description from JSON String
             JSONObject jsonobject = new JSONObject(jsonData);
-            System.out.println(jsonobject);
             return jsonobject.getString("description");
 
         } catch (JSONException e) {
