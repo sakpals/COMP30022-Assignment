@@ -1,4 +1,20 @@
 # Chlorine-Client
 COMP30022
 
-Bug: camera preview seems to only work with Nexus 4 API 19 emulator. [in progress]
+TASKS TO COMPLETE (DUE 20/08)
+
+[] Combine Client/Server Repo's to Zenhub Board
+
+[] For all features/issues in repo add: Descriptions
+
+[] For all features/issues in repo add: Priority
+
+[] For all features/issues in repo add: Dependency
+
+[] For all features/issues in repo add: Assignee
+
+[] For all features/issues in repo add: Milestones
+
+[] For all features/issues in repo add: Checklists i.e. what needs to be done in the next step
+
+[] Complete Workflow Plan
