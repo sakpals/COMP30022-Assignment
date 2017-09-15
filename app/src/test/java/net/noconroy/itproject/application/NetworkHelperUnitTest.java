@@ -93,7 +93,7 @@ public class NetworkHelperUnitTest {
 
     // Checks that the http GET request is successful
     @Test
-    public void GetProfileBasic() throws Exception {
+    public void GetProfileBasicTest() throws Exception {
         // Register and Login first
         String username = UUID.randomUUID().toString();
         NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
@@ -106,7 +106,7 @@ public class NetworkHelperUnitTest {
     // Checks that updating and getting the profile gives a correct output
     // Currently only works for getting description, not avatar url
     @Test
-    public void GetProfileAfterUpdate() throws Exception {
+    public void GetProfileAfterUpdateTest() throws Exception {
         // Register and Login first
         String username = UUID.randomUUID().toString();
         NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
@@ -114,7 +114,48 @@ public class NetworkHelperUnitTest {
 
         NetworkHelper.UpdateProfile(username, "test_password", "test_avatar_url", "test_description2", access_token);
 
-        if (!NetworkHelper.GetProfile(username, access_token).equals("test_description2")) throw new AssertionError();
+        if (!NetworkHelper.GetProfile(username, access_token).equals("test_description2"))
+            throw new AssertionError();
+    }
+
+    // Tests that a user can get another users profile
+    @Test
+    public void GetAnotherUsersProfileTest() throws Exception {
+        // Register and Login first user
+        String username1 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username1, "test_password", "test_avatar_url", "usr1_desc");
+        String access_token1 = NetworkHelper.Login(username1, "test_password");
+
+        // Register second user
+        String username2 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username2, "test_password", "test_avatar_url", "usr2_desc");
+
+        // Tests that first user can access profile of second user
+        if (!NetworkHelper.GetProfile(username2, access_token1).equals("usr2_desc"))
+            throw new AssertionError();
+    }
+
+    // Tests that a user cannot update another users profile
+    @Test
+    public void UpdateAnotherUsersProfileTest() throws Exception {
+        // Register and Login first
+        String username1 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username1, "test_password", "test_avatar_url", "usr1_desc");
+        String access_token1 = NetworkHelper.Login(username1, "test_password");
+
+        // Register and Login first
+        String username2 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username2, "test_password", "test_avatar_url", "usr2_desc");
+        String access_token2 = NetworkHelper.Login(username1, "test_password");
+
+        // Thesewill return an error if a user succesfully alters another users profile
+        if (NetworkHelper.UpdateProfile(username1,
+                "wrong_password", "test_avatar_url", "changed_desc", access_token2).equals("200"))
+            throw new AssertionError();
+
+        if (NetworkHelper.GetProfile(username1, access_token1).equals("changed_desc"))
+            throw new AssertionError();
+
     }
 
     // Tests that the server accepts the request
@@ -131,7 +172,7 @@ public class NetworkHelperUnitTest {
 
     // Test to make sure server returns error if invalid lat/lon inputted
     @Test
-    public void InvalidUpdateLocation() throws Exception {
+    public void InvalidUpdateLocationTest() throws Exception {
         // Register and Login first
         String username = UUID.randomUUID().toString();
         NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
@@ -173,7 +214,6 @@ public class NetworkHelperUnitTest {
         if (!NetworkHelper.RetrieveLocation(username, access_token)[1].equals("180.0"))
             throw new AssertionError();
     }
-
 }
 
 
