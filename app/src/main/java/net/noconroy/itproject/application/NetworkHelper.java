@@ -42,7 +42,16 @@ public final class NetworkHelper {
     private static final String FRIEND_REQUESTS_OUT = "/friends/requests/out";
     private static final String LOCATION = "location/";
 
-
+    /**
+     * Registers a user in the database, for now the user MUST enter all paramaters
+     *
+     * @param username The username that the user wishes to use, must not already be registered
+     *                 and TODO: must make sure the username is of correct format e.g. no invalid chars
+     * @param password The user chooses a password
+     * @param avatar_url The user chooses an avatar_url
+     * @param description The user chooses a description
+     * @return The http message the server sends in response to this request
+     */
     public static String Register(String username, String password, String avatar_url, String description) {
         final OkHttpClient client = new OkHttpClient();
 
@@ -86,6 +95,14 @@ public final class NetworkHelper {
         }
     }
 
+    /**
+     * Logs the user into the server and returns an access token, which
+     * they can then use to access more priviliged methods
+     *
+     * @param username The username the user inputted when they registered
+     * @param password The password the user inputted when they registered
+     * @return The access token assoicated with the user
+     */
     public static String Login(String username, String password) {
         final OkHttpClient client = new OkHttpClient();
         Gson gson = new Gson();
@@ -120,6 +137,13 @@ public final class NetworkHelper {
         }
     }
 
+    /**
+     * Logs the user out, which thus makes the current access token invalid
+     *
+     * @param access_token The users access token they received at login
+     * @param username The username associated with the access token
+     * @return The http message the server sends in response to this request
+     */
     public static String Logout(String access_token, String username) {
         final OkHttpClient client = new OkHttpClient();
 
@@ -162,7 +186,16 @@ public final class NetworkHelper {
         }
     }
 
-    // NOTE: can only update description currently, not avatar url
+    /**
+     * Allows the user to update their own profle
+     *
+     * @param username The users username
+     * @param password The users password
+     * @param avatar_url NOT CURRENTLY WORKING, but is the url the user wants to change it to
+     * @param description The new description the user wants on their profile
+     * @param access_token Users access token recieved at login
+     * @return The http message the server sends in response to this request
+     */
     public static String UpdateProfile(String username, String password, String avatar_url, String description, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
@@ -205,7 +238,14 @@ public final class NetworkHelper {
         }
     }
 
-    // TODO: Username needed as a paramater
+    /**
+     * Allows a user to get the profile of any other registered user
+     *
+     * @param username Any users username in the database
+     * @param access_token The current users username, does not need to be the one
+     *                     assoicaed with username
+     * @return The description of the profile for the user inputted as the username paramater
+     */
     public static String GetProfile(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
@@ -246,6 +286,7 @@ public final class NetworkHelper {
         // Should never reach here
         return null;
     }
+
 
     public static String UpdateLocation(String username, String lat, String lon, String access_token) {
         final OkHttpClient client = new OkHttpClient();
@@ -322,7 +363,7 @@ public final class NetworkHelper {
         try {
             // Extract description from JSON String
             JSONObject jsonobject = new JSONObject(jsonData);
-            System.out.println(jsonobject);
+
             // Note that optString is used here, so could return ""
             String dist = jsonobject.optString("distance");
             String dir = jsonobject.optString("direction");
