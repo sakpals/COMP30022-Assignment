@@ -40,11 +40,12 @@ public class NetworkHelperUnitTest {
         NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
 
         String access_token = NetworkHelper.Login(username, "test_password");
-        System.out.println(access_token);
 
         // Checks for whitespaces in access_token, which usually occers if the server is offline
-        if (access_token.matches(".*\\s+.*")) throw new AssertionError("Most likely server offline");
-        if (!access_token.matches(".*[a-z].*")) throw new AssumptionViolatedException("Most likely HTTP error");
+        if (access_token.matches(".*\\s+.*"))
+            throw new AssertionError("Most likely server offline");
+        if (!access_token.matches(".*[a-z].*"))
+            throw new AssumptionViolatedException("Most likely HTTP error");
     }
 
     // Tests below here assume Register and Login works
@@ -89,6 +90,33 @@ public class NetworkHelperUnitTest {
         if (!NetworkHelper.UpdateProfile(username, "test_password", "test_avatar_url", "test_description", access_token).equals("200"))
             throw new AssertionError();
     }
+
+    // Checks that the http GET request is successful
+    @Test
+    public void GetProfileBasic() throws Exception {
+        // Register and Login first
+        String username = UUID.randomUUID().toString();
+        NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
+        String access_token = NetworkHelper.Login(username, "test_password");
+
+        if (!NetworkHelper.GetProfile(username, access_token).equals("test_description")) throw new AssertionError();
+
+    }
+
+    // Checks that updating and getting the profile gives a correct output
+    // Currently only works for getting description, not avatar url
+    @Test
+    public void GetProfileAfterUpdate() throws Exception {
+        // Register and Login first
+        String username = UUID.randomUUID().toString();
+        NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
+        String access_token = NetworkHelper.Login(username, "test_password");
+
+        NetworkHelper.UpdateProfile(username, "test_password", "test_avatar_url", "test_description2", access_token);
+
+        if (!NetworkHelper.GetProfile(username, access_token).equals("test_description2")) throw new AssertionError();
+    }
+
 }
 
 
