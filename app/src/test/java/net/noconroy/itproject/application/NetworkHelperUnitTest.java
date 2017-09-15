@@ -138,12 +138,12 @@ public class NetworkHelperUnitTest {
     // Tests that a user cannot update another users profile
     @Test
     public void UpdateAnotherUsersProfileTest() throws Exception {
-        // Register and Login first
+        // Register and Login user 1 first
         String username1 = UUID.randomUUID().toString();
         NetworkHelper.Register(username1, "test_password", "test_avatar_url", "usr1_desc");
         String access_token1 = NetworkHelper.Login(username1, "test_password");
 
-        // Register and Login first
+        // Register and Login user 2
         String username2 = UUID.randomUUID().toString();
         NetworkHelper.Register(username2, "test_password", "test_avatar_url", "usr2_desc");
         String access_token2 = NetworkHelper.Login(username1, "test_password");
@@ -213,6 +213,27 @@ public class NetworkHelperUnitTest {
             throw new AssertionError();
         if (!NetworkHelper.RetrieveLocation(username, access_token)[1].equals("180.0"))
             throw new AssertionError();
+    }
+
+    // Tests that you cannot update the location of another use
+    @Test
+    public void UpdateOthersLocationTest() throws Exception {
+        // Register and Login user 1 first
+        String username1 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username1, "test_password", "test_avatar_url", "usr1_desc");
+        String access_token1 = NetworkHelper.Login(username1, "test_password");
+
+        // Register and Login user 2
+        String username2 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username2, "test_password", "test_avatar_url", "usr2_desc");
+        String access_token2 = NetworkHelper.Login(username1, "test_password");
+
+        // User 2 tried to update location of user 1. Will throw error if the
+        // server allows this to occur
+        NetworkHelper.UpdateLocation(username1, "10", "15", access_token1);
+        if (NetworkHelper.UpdateLocation(username1, "20", "30", access_token2).equals("200"))
+            throw new AssertionError();
+
     }
 }
 
