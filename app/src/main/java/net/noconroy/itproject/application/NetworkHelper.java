@@ -26,34 +26,54 @@ public final class NetworkHelper {
     private static final String SERVER_SCHEME = "http";
     private static final String SERVER_HOST = "127.0.0.1";
     private static final Integer SERVER_PORT = 5000;
+    private static final String JSON_HEADER_NAME = "content-type";
+    private static final String JSON_HEADER_VALUE = "application/json; charset=utf-8";
+    private static final MediaType JSON = MediaType.parse("Content-Type: application/json");
     private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
     private static final String USER_LOGIN = "/user/login";
-    private static final String USER_LOGOUT = "/user/logout";
-    private static final String USER_REGISTER = "/user/register";
-    private static final String USER_UPDATE_PROFILE = "/profile/";
+    private static final String USER_LOGOUT = "user/logout";
+    private static final String USER_REGISTER = "user/register";
+    private static final String USER_UPDATE_PROFILE = "profile/";
     private static final String FRIEND_LIST = "/friends";
-    private static final String FRIEND_ADD = "/friends/add/";
-    private static final String FRIEND_ACCEPT = "/friends/accept/";
-    private static final String FRIEND_REMOVE = "/friends/remove/";
+    private static final String FRIEND_ADD = "/friends/add";
+    private static final String FRIEND_ACCEPT = "/friends/accept";
+    private static final String FRIEND_REMOVE = "/friends/remove";
     private static final String FRIEND_REQUESTS_IN = "/friends/requests/in";
     private static final String FRIEND_REQUESTS_OUT = "/friends/requests/out";
-    private static final String LOCATION = "/location/";
+    private static final String LOCATION = "/location";
 
     public static String Register(String username, String password, String avatar_url, String description) {
-        String url = SERVER_ADDRESS + USER_REGISTER;
         final OkHttpClient client = new OkHttpClient();
 
-        RequestBody body = new FormBody.Builder()
-                .add("username", username)
-                .add("password", password)
-                .add("avatar_url", avatar_url)
-                .add("description", description)
+        // Create a string in the JSON format
+        String json = null;
+        try {
+            json = new JSONObject()
+                    .put("password", password)
+                    .put("avatar_url", avatar_url)
+                    .put("description", description)
+                    .put("username", username)
+                    .toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        RequestBody body = RequestBody.create(JSON, json);
+
+
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(USER_REGISTER)
                 .build();
 
         Request request = new Request.Builder()
+                .addHeader(JSON_HEADER_NAME, JSON_HEADER_VALUE)
                 .url(url)
                 .post(body)
                 .build();
+
 
         Call call = client.newCall(request);
         try {
@@ -77,6 +97,7 @@ public final class NetworkHelper {
                 .build();
 
         Request request = new Request.Builder()
+                .addHeader(JSON_HEADER_NAME, JSON_HEADER_VALUE)
                 .url(url)
                 .post(body)
                 .build();
@@ -98,13 +119,8 @@ public final class NetworkHelper {
         }
     }
 
-    // TODO: Unit test fails unauthorised, check
     public static String Logout(String access_token, String username) {
         final OkHttpClient client = new OkHttpClient();
-
-        final MediaType JSON
-                = MediaType.parse("Content-Type: application/json");
-
 
         // Create a string in the JSON format
         String json = null;
@@ -130,6 +146,7 @@ public final class NetworkHelper {
                 .build();
 
         Request request = new Request.Builder()
+                .addHeader(JSON_HEADER_NAME, JSON_HEADER_VALUE)
                 .url(url)
                 .post(body)
                 .build();
@@ -144,20 +161,35 @@ public final class NetworkHelper {
         }
     }
 
+    // NOTE: can only update description currently, not avatar url
     public static String UpdateProfile(String username, String password, String avatar_url, String description, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + USER_UPDATE_PROFILE + username;
+        // Create a string in the JSON format
+        String json = null;
+        try {
+            json = new JSONObject()
+                    .put("description", description)
+                    .toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        RequestBody body = new FormBody.Builder()
-                .add("username", username)
-                .add("password", password)
-                .add("avatar_url", avatar_url)
-                .add("description", description)
-                .add("access_token", access_token)
+        RequestBody body = RequestBody.create(JSON, json);
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = access_token.replaceAll("^\"|\"$", "");
+
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(USER_UPDATE_PROFILE + username)
+                .addQueryParameter("access_token", access_token)
                 .build();
 
         Request request = new Request.Builder()
+                .addHeader(JSON_HEADER_NAME, JSON_HEADER_VALUE)
                 .url(url)
                 .put(body)
                 .build();
@@ -173,7 +205,45 @@ public final class NetworkHelper {
     }
 
     public static String GetProfile(String username, String access_token) {
-        return "200";
+        final OkHttpClient client = new OkHttpClient();
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = access_token.replaceAll("^\"|\"$", "");
+
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(USER_UPDATE_PROFILE + username)
+                .addQueryParameter("access_token", access_token)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Call call = client.newCall(request);
+        String jsonData = null;
+        try {
+            Response response = call.execute();
+
+            // Raw JSON data below in String format
+            jsonData = response.body().string();
+
+        }  catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            // Extract description from JSON String
+            JSONObject jsonobject = new JSONObject(jsonData);
+            System.out.println(jsonobject);
+            return jsonobject.getString("description");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // Should never reach here
+        return null;
     }
 
     public static String UpdateLocation(String username, String lat, String lon, String access_token) {
