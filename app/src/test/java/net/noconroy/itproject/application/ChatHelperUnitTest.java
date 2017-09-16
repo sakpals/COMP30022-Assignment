@@ -3,6 +3,7 @@ package net.noconroy.itproject.application;
 import com.google.gson.Gson;
 
 import org.junit.AssumptionViolatedException;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -14,13 +15,12 @@ public class ChatHelperUnitTest {
 
     private static String username;
     private static String access_token;
-    private static String channel_name;
 
-    @BeforeClass
+    @Before
     public void AccountSetup() {
-        String username = UUID.randomUUID().toString();
+        username = UUID.randomUUID().toString();
         NetworkHelper.Register(username, "test_password", "test_avatar_url", "test_description");
-        String access_token = NetworkHelper.Login(username, "test_password");
+        access_token = NetworkHelper.Login(username, "test_password");
     }
 
     @Test
@@ -38,6 +38,7 @@ public class ChatHelperUnitTest {
             throw new AssertionError();
     }
 
+    // Fails because creating a channel also subscribes the creator
     @Test
     public void SubscribeChannelTest() {
         String channel_name = UUID.randomUUID().toString();
@@ -50,7 +51,6 @@ public class ChatHelperUnitTest {
     public void LeaveChannelTest() {
         String channel_name = UUID.randomUUID().toString();
         ChatHelper.CreateChannel(channel_name, access_token);
-        ChatHelper.SubscribeChannel(channel_name, access_token);
         if (!ChatHelper.LeaveChannel(channel_name, access_token).equals("200"))
             throw new AssertionError();
     }

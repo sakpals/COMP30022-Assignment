@@ -16,7 +16,7 @@ import okhttp3.Response;
  */
 
 public final class ChatHelper {
-    private static final String SERVER_ADDRESS = "127.0.0.1:5000";
+    private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
     private static final String CHANNEL = "/channel/";
     private static final String JOIN = "/join";
     private static final String LEAVE = "/leave";
@@ -26,6 +26,7 @@ public final class ChatHelper {
         final OkHttpClient client = new OkHttpClient();
 
         String url = SERVER_ADDRESS + CHANNEL + name;
+        access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
                 .add("access_token", access_token)
@@ -47,13 +48,14 @@ public final class ChatHelper {
     }
 
     public static String DeleteChannel(String name, String access_token) {
-        return "200";
+        return "-1";
     }
 
     public static String SubscribeChannel(String name, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
         String url = SERVER_ADDRESS + CHANNEL + name + JOIN;
+        access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
                 .add("access_token", access_token)
@@ -78,6 +80,7 @@ public final class ChatHelper {
         final OkHttpClient client = new OkHttpClient();
 
         String url = SERVER_ADDRESS + CHANNEL + name + LEAVE;
+        access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
                 .add("access_token", access_token)
@@ -99,10 +102,10 @@ public final class ChatHelper {
     }
 
     public static String MessageChannel(String name, Gson message, String access_token) {
-        return "200";
+        return "-1";
     }
 
     public static String PollChannels(String access_token) {
-        return "200";
+        return "-1";
     }
 }
