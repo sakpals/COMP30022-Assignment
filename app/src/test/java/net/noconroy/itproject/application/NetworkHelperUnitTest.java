@@ -409,9 +409,54 @@ public class NetworkHelperUnitTest {
         if (NetworkHelper.GetFriends(access_token1).size() != 0) throw new AssertionError();
     }
 
+    // Tests that other users can't accept friend requests
+    @Test
+    public void GetIncomingFriendRequestsTest() throws Exception {
+        // Register user 1 first
+        String username1 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username1, "test_password", "test_avatar_url", "usr1_desc");
+        String access_token1 = NetworkHelper.Login(username1, "test_password");
+
+        // Register and Login user 2
+        String username2 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username2, "test_password", "test_avatar_url", "usr2_desc");
+        String access_token2 = NetworkHelper.Login(username2, "test_password");
+
+        if (NetworkHelper.GetIncomingFriendRequests(access_token2) != null) throw new AssertionError();
+        if (NetworkHelper.GetIncomingFriendRequests(access_token1) != null) throw new AssertionError();
+
+        // User 2 sends friend request to user 1
+        NetworkHelper.AddFriend(username1, access_token2);
+
+        // Check that the incoming friend request is there
+        ArrayList<ArrayList<String>> out = NetworkHelper.GetIncomingFriendRequests(access_token1);
+        if (!out.get(0).get(0).toString().equals(username2)) throw new AssertionError();
+    }
+
+    @Test
+    public void GetOutgoingFriendRequestsTest() throws Exception {
+        // Register user 1 first
+        String username1 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username1, "test_password", "test_avatar_url", "usr1_desc");
+        String access_token1 = NetworkHelper.Login(username1, "test_password");
+
+        // Register and Login user 2
+        String username2 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username2, "test_password", "test_avatar_url", "usr2_desc");
+        String access_token2 = NetworkHelper.Login(username2, "test_password");
+
+        if (NetworkHelper.GetOutgoingFriendRequests(access_token2) != null) throw new AssertionError();
+        if (NetworkHelper.GetOutgoingFriendRequests(access_token1) != null) throw new AssertionError();
+
+        // User 2 sends friend request to user 1
+        NetworkHelper.AddFriend(username1, access_token2);
+
+        // Check that the outgoing friend request is there
+        ArrayList<ArrayList<String>> out = NetworkHelper.GetOutgoingFriendRequests(access_token2);
+        if (!out.get(0).get(0).toString().equals(username1)) throw new AssertionError();
+    }
 
 }
-
 
 
 
