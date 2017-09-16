@@ -251,12 +251,6 @@ public class NetworkHelperUnitTest {
         String access_token2 = NetworkHelper.Login(username1, "test_password");
 
         System.out.println(NetworkHelper.AddFriend(username1, access_token2));
-
-        // User 2 tried to add user 1 as a friend
-        //NetworkHelper.UpdateLocation(username1, "10", "15", access_token1);
-        //if (!NetworkHelper.AddFriend(username1, access_token2).equals("201"))
-         //   throw new AssertionError();
-
     }
 
     @Test
@@ -272,11 +266,6 @@ public class NetworkHelperUnitTest {
         String access_token2 = NetworkHelper.Login(username2, "test_password");
 
         System.out.println(NetworkHelper.AddFriend(username1, access_token2));
-
-        // User 2 tried to add user 1 as a friend
-        //NetworkHelper.UpdateLocation(username1, "10", "15", access_token1);
-        //if (!NetworkHelper.AddFriend(username1, access_token2).equals("201"))
-        //   throw new AssertionError();
     }
 
     // Tests that you can't send multiple friend requests to a single user from
