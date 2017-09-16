@@ -50,8 +50,8 @@ public final class NetworkHelper {
     private static final String FRIEND_ADD = "friends/add/";
     private static final String FRIEND_ACCEPT = "friends/accept/";
     private static final String FRIEND_REMOVE = "friends/remove/";
-    private static final String FRIEND_REQUESTS_IN = "/friends/requests/in";
-    private static final String FRIEND_REQUESTS_OUT = "/friends/requests/out";
+    private static final String FRIEND_REQUESTS_IN = "friends/requests/in";
+    private static final String FRIEND_REQUESTS_OUT = "friends/requests/out";
     private static final String LOCATION = "location/";
 
 
@@ -372,7 +372,6 @@ public final class NetworkHelper {
                 .url(url)
                 //.post(body)
                 .build();
-        System.out.println(request);
 
         Call call = client.newCall(request);
         try {
@@ -403,7 +402,6 @@ public final class NetworkHelper {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        System.out.println(request);
 
         Call call = client.newCall(request);
         try {
@@ -451,8 +449,7 @@ public final class NetworkHelper {
         try {
             // Extract description from JSON String
             JSONObject jsonobject = new JSONObject(jsonData);
-            System.out.println(jsonobject);
-            return jsonProfileToArrayList(jsonobject);
+            return jsonProfilesToArrayList(jsonobject, new String[] {"username", "description"}, "friends");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -461,6 +458,14 @@ public final class NetworkHelper {
         return null;
     }
 
+
+    /**
+     *
+     * @param username The username of the friend you wish to remove
+     * @param access_token The access token of the current user (not the one
+     *                     being removed)
+     * @return The http message the server sends in response to this request
+     */
     public static String RemoveFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
@@ -480,12 +485,104 @@ public final class NetworkHelper {
         }
     }
 
-    public static String GetIncomingFriendRequests(String access_token) {
-        return "200";
+
+    /**
+     * Gets a users incoming friend requests
+     *
+     * @param access_token The access token of the current user (who wants
+     *                     their incoming friend requests
+     * @return If there are no incoming friend requests, null is returned. If
+     * there is, 2d arraylist if returned, the outer arraylist containing
+     * the profiles, the inner array containg profile information (which is
+     * only usernames so far)
+     */
+    public static ArrayList<ArrayList<String>> GetIncomingFriendRequests(String access_token) {
+        final OkHttpClient client = new OkHttpClient();
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = removeQuotations(access_token);
+
+        HttpUrl url = constructURL(FRIEND_REQUESTS_IN, access_token);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Call call = client.newCall(request);
+        String jsonData = null;
+        try {
+            Response response = call.execute();
+
+            // Raw JSON data below in String format
+            jsonData = response.body().string();
+
+        }  catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            // Extract description from JSON String
+            JSONObject jsonobject = new JSONObject(jsonData);
+
+            // Returns null if there are no incoming requests
+            if (jsonobject.get("requests").toString().equals("[]")) return null;
+
+            return jsonProfilesToArrayList(jsonobject, new String[] {"username"}, "requests");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // Should never reach here
+        return null;
     }
 
-    public static String GetOutgoingFriendRequests(String access_token) {
-        return "200";
+
+    /**
+     * Gets a users outgoing friend requests
+     *
+     * @param access_token The access token of the current user (who wants
+     *                     their incoming friend requests
+     * @return If there are no outgoing friend requests, null is returned.
+     * If there is, a 2d arraylist is returned, the outer arraylist containing
+     * the profiles, the inner array containg profile information (which is
+     * only usernamesso far)
+     */
+    public static ArrayList<ArrayList<String>> GetOutgoingFriendRequests(String access_token) {
+        final OkHttpClient client = new OkHttpClient();
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = removeQuotations(access_token);
+
+        HttpUrl url = constructURL(FRIEND_REQUESTS_OUT, access_token);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Call call = client.newCall(request);
+        String jsonData = null;
+        try {
+            Response response = call.execute();
+
+            // Raw JSON data below in String format
+            jsonData = response.body().string();
+
+        }  catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            // Extract description from JSON String
+            JSONObject jsonobject = new JSONObject(jsonData);
+
+            // Returns null if there are no outgoing requests
+            if (jsonobject.get("requests").toString().equals("[]")) return null;
+
+            return jsonProfilesToArrayList(jsonobject, new String[] {"username"}, "requests");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // Should never reach here
+        return null;
     }
 
 
@@ -553,35 +650,27 @@ public final class NetworkHelper {
      * list containing username and description respectively
      * users profile
      */
-    private static ArrayList<ArrayList<String>> jsonProfileToArrayList (JSONObject json){
+    private static ArrayList<ArrayList<String>> jsonProfilesToArrayList (JSONObject json,
+                                                                         String[] attrs,
+                                                                         String jsonType){
 
-        // The possible names of the attributes in the json file for the profile
-        final String[] profileNames = {"username", "description"};
-
-        int outlen = -1;
-        try {
-            outlen = json.getJSONArray("friends").length();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>(outlen);
+        ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>(attrs.length);
 
         try {
             // Get the profile for ONE user
-            JSONArray profileArray = json.getJSONArray("friends");
+            JSONArray profileArray = json.getJSONArray(jsonType);
 
             // Iterate over each profile
             for (int i=0; i< profileArray.length(); i++){
 
                 JSONObject profile = profileArray.getJSONObject(i);
-                ArrayList<String> line = new ArrayList<String>(profileNames.length);
+                ArrayList<String> line = new ArrayList<String>(attrs.length);
                 JSONObject profileContents = profile.getJSONObject("profile");
 
                 // Extract values from each attribute from the profile
-                for (int j=0; j<profileNames.length; j++){
-                    if (profileContents.getString(profileNames[j]) != null){
-                        line.add(profileContents.getString(profileNames[j]).toString());
+                for (int j=0; j<attrs.length; j++){
+                    if (profileContents.getString(attrs[j]) != null){
+                        line.add(profileContents.getString(attrs[j]).toString());
                     }
                 }
                 output.add(line);
