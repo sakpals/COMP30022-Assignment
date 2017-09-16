@@ -383,6 +383,32 @@ public class NetworkHelperUnitTest {
         if (!out.get(1).get(1).equals("usr3_desc3")) throw new AssertionError();
     }
 
+    @Test
+    public void RemoveFriendTest() throws Exception {
+        // Register user 1 first
+        String username1 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username1, "test_password", "test_avatar_url", "usr1_desc");
+        String access_token1 = NetworkHelper.Login(username1, "test_password");
+
+        // Register and Login user 2
+        String username2 = UUID.randomUUID().toString();
+        NetworkHelper.Register(username2, "test_password", "test_avatar_url", "usr2_desc");
+        String access_token2 = NetworkHelper.Login(username2, "test_password");
+
+        // User 2 sends friend request to user 1
+        NetworkHelper.AddFriend(username1, access_token2);
+
+        // User 1 accepts user 2's friend request
+        NetworkHelper.AddFriend(username2, access_token1);
+
+        // User 1 removes user 2 as a friends
+        NetworkHelper.RemoveFriend(username2, access_token1);
+
+        // Check that both user now have no friends
+        if (NetworkHelper.GetFriends(access_token1).size() != 0) throw new AssertionError();
+        if (NetworkHelper.GetFriends(access_token1).size() != 0) throw new AssertionError();
+    }
+
 
 }
 

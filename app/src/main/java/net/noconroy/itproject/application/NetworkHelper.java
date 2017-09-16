@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import okhttp3.Call;
-import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -44,7 +43,7 @@ public final class NetworkHelper {
     private static final String FRIEND_LIST = "/friends";
     private static final String FRIEND_ADD = "friends/add/";
     private static final String FRIEND_ACCEPT = "friends/accept/";
-    private static final String FRIEND_REMOVE = "/friends/remove";
+    private static final String FRIEND_REMOVE = "friends/remove/";
     private static final String FRIEND_REQUESTS_IN = "/friends/requests/in";
     private static final String FRIEND_REQUESTS_OUT = "/friends/requests/out";
     private static final String LOCATION = "location/";
@@ -459,15 +458,10 @@ public final class NetworkHelper {
     public static String RemoveFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + FRIEND_REMOVE + username;
-
-        RequestBody body = new FormBody.Builder()
-                .add("access_token", access_token)
-                .build();
+        HttpUrl url = constructURL(FRIEND_REMOVE + username, access_token);
 
         Request request = new Request.Builder()
                 .url(url)
-                .post(body)
                 .build();
 
         Call call = client.newCall(request);
