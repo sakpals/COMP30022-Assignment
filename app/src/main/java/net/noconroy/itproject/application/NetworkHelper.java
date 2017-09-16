@@ -1,5 +1,10 @@
 package net.noconroy.itproject.application;
 
+/**
+ * This class provides a RESTful interface in order for the server to easily
+ * interact with the client
+ */
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -20,6 +25,7 @@ import okhttp3.Response;
 
 /**
  * Created by James on 7/09/2017.
+ * Created by Bryce
  */
 
 public final class NetworkHelper {
