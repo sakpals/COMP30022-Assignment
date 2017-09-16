@@ -349,6 +349,12 @@ public final class NetworkHelper {
     /************************************************************************/
 
 
+    /**
+     *
+     * @param username The username of the user you want to add
+     * @param access_token The current users access token (not the target users)
+     * @return The http message the server sends in response to this request
+     */
     public static String AddFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
@@ -373,7 +379,14 @@ public final class NetworkHelper {
         }
     }
 
-
+    /**
+     *
+     *
+     * @param username The username of the user who sent the friend request
+     * @param access_token The access token of the user who is accepting the
+     *                     friend request
+     * @return The http message the server sends in response to this request
+     */
     public static String AcceptFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
@@ -398,7 +411,15 @@ public final class NetworkHelper {
     }
 
 
-
+    /**
+     * Gets the profile of all a users friends
+     *
+     * @param access_token The access token of the user who's friends list
+     *                     will be displayed
+     * @return A 2d arraylist, the outer arraylist being each profile, and
+     * th inner arraylist displaying the profile attribute values, which is
+     * currently only username and description
+     */
     public static ArrayList<ArrayList<String>> GetFriends(String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
