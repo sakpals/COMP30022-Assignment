@@ -48,7 +48,28 @@ public final class ChatHelper {
     }
 
     public static String DeleteChannel(String name, String access_token) {
-        return "-1";
+        final OkHttpClient client = new OkHttpClient();
+
+        String url = SERVER_ADDRESS + CHANNEL + name;
+        access_token = access_token.replaceAll("^\"|\"$", "");
+
+        RequestBody body = new FormBody.Builder()
+                .add("access_token", access_token)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .delete(body)
+                .build();
+
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            return Integer.toString(response.code());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
     }
 
     public static String SubscribeChannel(String name, String access_token) {
@@ -101,8 +122,32 @@ public final class ChatHelper {
         }
     }
 
-    public static String MessageChannel(String name, Gson message, String access_token) {
-        return "-1";
+    public static String MessageChannel(String name, String message, String access_token) {
+        final OkHttpClient client = new OkHttpClient();
+
+        String url = SERVER_ADDRESS + CHANNEL + name + MESSAGE;
+        access_token = access_token.replaceAll("^\"|\"$", "");
+
+        RequestBody body = new FormBody.Builder()
+                .add("channel", name)
+                .add("message_type", "text/plain")
+                .add("message", message)
+                .add("access_token", access_token)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            return Integer.toString(response.code());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
     }
 
     public static String PollChannels(String access_token) {
