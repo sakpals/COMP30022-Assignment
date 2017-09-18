@@ -15,6 +15,6 @@ TASKS TO COMPLETE (DUE 20/08)
 
 [] For all features/issues in repo add: Milestones
 
-[] For all features/issues in repo add: Checklists i.e. what needs to be done in the next step 
+[] For all features/issues in repo add: Checklists i.e. what needs to be done in the next step
 
-[] Complete Workflow Plan 
+[] Complete Workflow Plan
