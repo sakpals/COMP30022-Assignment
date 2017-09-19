@@ -28,7 +28,7 @@ public class NetworkHelperUnitTest {
     @Test
     public void RegisterTest() throws Exception {
         String username = UUID.randomUUID().toString();
-        String response = Register(username, "test_password",
+        String response = NetworkHelper.Register(username, "test_password",
                 "test_avatar_url", "test_description");
         if (!response.equals("201"))
             throw new AssertionError(response);
@@ -40,17 +40,17 @@ public class NetworkHelperUnitTest {
     public void RegisterTwiceTest() throws Exception {
 
         final String likelyerror =
-                "you're most likely trying to register a username that already" +
-                        "exists";
+                "you're most likely trying to register a username that" +
+                        "already exists";
 
         String username = UUID.randomUUID().toString();
-        String response = Register(username, "test_password",
+        String response = NetworkHelper.Register(username, "test_password",
                 "test_avatar_url", "test_description");
         if (!response.equals("201"))
             throw new AssertionError(response);
 
         // Try to register again
-        response = Register(username, "test_password",
+        response = NetworkHelper.Register(username, "test_password",
                 "test_avatar_url", "test_description");
         if (response.equals("500"))
             throw new AssertionError(likelyerror);
