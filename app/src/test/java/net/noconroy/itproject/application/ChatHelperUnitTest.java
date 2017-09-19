@@ -64,18 +64,17 @@ public class ChatHelperUnitTest {
     public void MessageChannelTest() {
         String channel_name = UUID.randomUUID().toString();
         ChatHelper.CreateChannel(channel_name, access_token);
-        ChatHelper.SubscribeChannel(channel_name, access_token);
-        if (!ChatHelper.MessageChannel(channel_name, "test_message", access_token).equals("200"))
+        ChatHelper.SubscribeChannel(channel_name, access_token2);
+        if (!ChatHelper.MessageChannel(channel_name, "test_message", access_token2).equals("200"))
             throw new AssertionError();
     }
 
     @Test
-    public void PollChannelsTest() {
+    public void ListenChannelsTest() {
         String channel_name = UUID.randomUUID().toString();
         ChatHelper.CreateChannel(channel_name, access_token);
-        ChatHelper.SubscribeChannel(channel_name, access_token);
-        if (!ChatHelper.PollChannels(access_token).equals("200"))
-            throw new AssertionError();
+        ChatHelper.SubscribeChannel(channel_name, access_token2);
+        ChatHelper.ListenChannels(access_token2);
     }
 }
 
