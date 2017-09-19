@@ -363,6 +363,9 @@ public final class NetworkHelper {
     public static String AddFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
+        // Create an empty body
+        RequestBody body = RequestBody.create(null, new byte[0]);
+
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
@@ -370,7 +373,7 @@ public final class NetworkHelper {
 
         Request request = new Request.Builder()
                 .url(url)
-                //.post(body)
+                .post(body)
                 .build();
 
         Call call = client.newCall(request);
@@ -394,6 +397,9 @@ public final class NetworkHelper {
     public static String AcceptFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
+        // Create an empty body
+        RequestBody body = RequestBody.create(null, new byte[0]);
+
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
@@ -401,6 +407,7 @@ public final class NetworkHelper {
 
         Request request = new Request.Builder()
                 .url(url)
+                .post(body)
                 .build();
 
         Call call = client.newCall(request);
@@ -469,10 +476,14 @@ public final class NetworkHelper {
     public static String RemoveFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
+        // Create an empty body
+        RequestBody body = RequestBody.create(null, new byte[0]);
+
         HttpUrl url = constructURL(FRIEND_REMOVE + username, access_token);
 
         Request request = new Request.Builder()
                 .url(url)
+                .post(body)
                 .build();
 
         Call call = client.newCall(request);
