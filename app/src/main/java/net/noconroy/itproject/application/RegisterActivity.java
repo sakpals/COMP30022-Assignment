@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    public static final String ACCESS_TOKEN_MESSAGE = "aser_access_token";
+    public static final String ACCESS_TOKEN_MESSAGE = "user_access_token";
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -24,8 +24,6 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mUsernameView;
     private EditText mPasswordView;
     private Button mLoginButton;
-    private View mProgressView;
-    private View mLoginFormView;
 
 
     @Override
@@ -88,9 +86,16 @@ public class RegisterActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
+            // Create Toast popup to show user that registration is occuring
+            Context context = getApplicationContext();
+            CharSequence text =  "Registering now, hold tight!";;
+            int duration = Toast.LENGTH_LONG;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+
+            // Kick off a background task to
             // perform the user login attempt.
-            //showProgress(true);
             mAuthTask = new RegisterActivity.UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
         }
@@ -110,7 +115,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         private final String mUsername;
         private final String mPassword;
-        private String serverResponse;
+        private String access_token;
 
         UserLoginTask(String username, String password) {
             mUsername = username;
@@ -120,25 +125,24 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            //serverResponse = NetworkHelper.Register(mUsername, mPassword, "", "No Description");
+            String response = NetworkHelper.Register(mUsername, mPassword, "", "No Description");
 
-            // Server returns http message 201 if it is successful
-            //if (serverResponse.equals("201")) return true;
+            access_token = NetworkHelper.Login(mUsername, mPassword);
 
-            // TODO: change this to false
-            return true;
+            if (response.equals("201")) return true;
+
+            return false;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            //showProgress(false);
 
             if (success) {
 
                 // Create Toast popup
                 Context context = getApplicationContext();
-                CharSequence text = "Register Successful!!";
+                CharSequence text =  "Registering was successful!";;
                 int duration = Toast.LENGTH_SHORT;
 
                 Toast toast = Toast.makeText(context, text, duration);
@@ -147,14 +151,10 @@ public class RegisterActivity extends AppCompatActivity {
                 // Send an intent to main activity with the user's access token
                 Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
 
-                intent.putExtra(ACCESS_TOKEN_MESSAGE, "insert-token-here");
+                intent.putExtra(ACCESS_TOKEN_MESSAGE, access_token);
                 startActivity(intent);
-
-                // Go back to main activity
-                //finish();
             } else {
-                if (serverResponse.equals("500")) mPasswordView.setError("Username taken, try again");
-                else mPasswordView.setError("Server Error");
+                mPasswordView.setError("Error, try again");
                 mUsernameView.requestFocus();
             }
         }
@@ -162,7 +162,6 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            //showProgress(false);
         }
     }
 }
