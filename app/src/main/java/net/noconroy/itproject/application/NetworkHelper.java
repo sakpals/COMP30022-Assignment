@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import okhttp3.Call;
 import okhttp3.HttpUrl;
@@ -74,9 +75,9 @@ public final class NetworkHelper {
         final OkHttpClient client = new OkHttpClient();
 
         RequestBody body =  createBodyRequest(new String [] {"password", password},
-                                new String [] {"avatar_url", avatar_url},
-                                new String [] {"description", description},
-                                new String [] {"username", username});
+                new String [] {"avatar_url", avatar_url},
+                new String [] {"description", description},
+                new String [] {"username", username});
 
         HttpUrl url = new HttpUrl.Builder()
                 .scheme(SERVER_SCHEME)
@@ -116,7 +117,7 @@ public final class NetworkHelper {
         final OkHttpClient client = new OkHttpClient();
 
         RequestBody body =  createBodyRequest(new String [] {"username", username},
-                                      new String [] {"password", password});
+                new String [] {"password", password});
 
         HttpUrl url = new HttpUrl.Builder()
                 .scheme(SERVER_SCHEME)
@@ -159,6 +160,9 @@ public final class NetworkHelper {
     public static String Logout(String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
+        // Create an empty body
+        RequestBody body = RequestBody.create(null, new byte[0]);
+
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
@@ -166,6 +170,7 @@ public final class NetworkHelper {
 
         Request request = new Request.Builder()
                 .url(url)
+                .post(body)
                 .build();
 
         Call call = client.newCall(request);
@@ -277,7 +282,7 @@ public final class NetworkHelper {
         final OkHttpClient client = new OkHttpClient();
 
         RequestBody body =  createBodyRequest(new String [] {"lat", lat},
-                                              new String [] {"lon", lon});
+                new String [] {"lon", lon});
 
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
@@ -363,6 +368,9 @@ public final class NetworkHelper {
     public static String AddFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
+        // Create an empty body
+        RequestBody body = RequestBody.create(null, new byte[0]);
+
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
@@ -370,7 +378,7 @@ public final class NetworkHelper {
 
         Request request = new Request.Builder()
                 .url(url)
-                //.post(body)
+                .post(body)
                 .build();
 
         Call call = client.newCall(request);
@@ -386,21 +394,26 @@ public final class NetworkHelper {
     /**
      *
      *
-     * @param username The username of the user who sent the friend request
+     * @param friendship_token The friendship_token of the user who sent the
+     *                         friend request
      * @param access_token The access token of the user who is accepting the
      *                     friend request
      * @return The http message the server sends in response to this request
      */
-    public static String AcceptFriend(String username, String access_token) {
+    public static String AcceptFriend(String friendship_token, String access_token) {
         final OkHttpClient client = new OkHttpClient();
+
+        // Create an empty body
+        RequestBody body = RequestBody.create(null, new byte[0]);
 
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
-        HttpUrl url = constructURL(FRIEND_ACCEPT + username, access_token);
+        HttpUrl url = constructURL(FRIEND_ACCEPT + friendship_token, access_token);
 
         Request request = new Request.Builder()
                 .url(url)
+                .post(body)
                 .build();
 
         Call call = client.newCall(request);
@@ -449,7 +462,7 @@ public final class NetworkHelper {
         try {
             // Extract description from JSON String
             JSONObject jsonobject = new JSONObject(jsonData);
-            return jsonProfilesToArrayList(jsonobject, new String[] {"username", "description"}, "friends");
+            return jsonProfilesToArrayList(jsonobject, new String[] {"username", "description"}, "profile", "friends");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -469,10 +482,14 @@ public final class NetworkHelper {
     public static String RemoveFriend(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
+        // Create an empty body
+        RequestBody body = RequestBody.create(null, new byte[0]);
+
         HttpUrl url = constructURL(FRIEND_REMOVE + username, access_token);
 
         Request request = new Request.Builder()
                 .url(url)
+                .post(body)
                 .build();
 
         Call call = client.newCall(request);
@@ -492,11 +509,10 @@ public final class NetworkHelper {
      * @param access_token The access token of the current user (who wants
      *                     their incoming friend requests
      * @return If there are no incoming friend requests, null is returned. If
-     * there is, 2d arraylist if returned, the outer arraylist containing
-     * the profiles, the inner array containg profile information (which is
-     * only usernames so far)
+     * there is, a hashamp is returned, with the key:username, value:
+     * friendship request token
      */
-    public static ArrayList<ArrayList<String>> GetIncomingFriendRequests(String access_token) {
+    public static HashMap<String, String> GetIncomingFriendRequests(String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
         // Remove quotation marks so it is in the correct format for okhttp3
@@ -526,7 +542,17 @@ public final class NetworkHelper {
             // Returns null if there are no incoming requests
             if (jsonobject.get("requests").toString().equals("[]")) return null;
 
-            return jsonProfilesToArrayList(jsonobject, new String[] {"username"}, "requests");
+            // Get all usernames and tokens
+            ArrayList<ArrayList<String>> userslst = jsonProfilesToArrayList(jsonobject, new String[] {"username"}, "profile", "requests");
+            ArrayList<ArrayList<String>> tokenslst = jsonProfilesToArrayList(jsonobject, new String[] {"token"}, "token", "requests");
+
+            // Put these user tokens in a hashmap with key:username, value:token
+            HashMap<String, String> usertokens = new HashMap<>();
+            for (int i=0; i<userslst.size(); i++){
+                usertokens.put(userslst.get(i).get(0), tokenslst.get(i).get(0));
+            }
+
+            return usertokens;
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -576,7 +602,7 @@ public final class NetworkHelper {
             // Returns null if there are no outgoing requests
             if (jsonobject.get("requests").toString().equals("[]")) return null;
 
-            return jsonProfilesToArrayList(jsonobject, new String[] {"username"}, "requests");
+            return jsonProfilesToArrayList(jsonobject, new String[] {"username"}, "profile", "requests");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -652,20 +678,30 @@ public final class NetworkHelper {
      */
     private static ArrayList<ArrayList<String>> jsonProfilesToArrayList (JSONObject json,
                                                                          String[] attrs,
-                                                                         String jsonType){
+                                                                         String jsonType,
+                                                                         String jsonSubType){
 
         ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>(attrs.length);
 
         try {
             // Get the profile for ONE user
-            JSONArray profileArray = json.getJSONArray(jsonType);
+            JSONArray profileArray = json.getJSONArray(jsonSubType);
 
             // Iterate over each profile
             for (int i=0; i< profileArray.length(); i++){
 
                 JSONObject profile = profileArray.getJSONObject(i);
                 ArrayList<String> line = new ArrayList<String>(attrs.length);
-                JSONObject profileContents = profile.getJSONObject("profile");
+
+                // Goes one level deeper in a json object
+                JSONObject profileContents = profile.optJSONObject(jsonType);
+
+                // If this can't occur, then it is already as deep as it can go
+                // In other words, the next level is attributes/values, so thus
+                // must revert back to a json object the level above
+                if (profileContents == null){
+                    profileContents = profile;
+                }
 
                 // Extract values from each attribute from the profile
                 for (int j=0; j<attrs.length; j++){

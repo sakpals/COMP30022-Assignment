@@ -4,6 +4,7 @@ import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static net.noconroy.itproject.application.NetworkHelper.Register;
@@ -327,8 +328,15 @@ public class NetworkHelperUnitTest {
         // User 2 sends friend request to user 1
         NetworkHelper.AddFriend(username1, access_token2);
 
+        // User 1 gets incoming friend requests
+        HashMap<String, String> user1map = NetworkHelper.
+                GetIncomingFriendRequests(access_token1);
+
+        // Gets the friendship token associated with user 2
+        String user1_friendship_token = user1map.get(username2);
+
         // User 2 tried to accept the friend request
-        if (!NetworkHelper.AcceptFriend(username2, access_token2).equals("500"))
+        if (!NetworkHelper.AcceptFriend(user1_friendship_token, access_token2).equals("500"))
             throw new AssertionError();
     }
 
@@ -354,13 +362,27 @@ public class NetworkHelperUnitTest {
         NetworkHelper.AddFriend(username2, access_token1);
 
         // User 1 sends friend request to user 3
-        NetworkHelper.AddFriend(username3, access_token1);
+        NetworkHelper.AddFriend(username3, access_token1);;
+
+        // User 2 gets incoming friend requests
+        HashMap<String, String> user2map = NetworkHelper.
+                GetIncomingFriendRequests(access_token2);
+
+        // Gets the friendship token associated with user 1
+        String user2_friendship_token = user2map.get(username1);
+
+        // User 3 gets incoming friend requests
+        HashMap<String, String> user3map = NetworkHelper.
+                GetIncomingFriendRequests(access_token3);
+
+        // Gets the friendship token associated with user 1
+        String user3_friendship_token = user3map.get(username1);
 
         // User 2 accepts friend request of user 1
-        NetworkHelper.AcceptFriend(username1, access_token2);
+        NetworkHelper.AcceptFriend(user2_friendship_token, access_token2);
 
         // User 3 accepts friend request of user 1
-        NetworkHelper.AcceptFriend(username1, access_token3);
+        NetworkHelper.AcceptFriend(user3_friendship_token, access_token3);
 
         // The output from the server
         ArrayList<ArrayList<String>> out = NetworkHelper.GetFriends(access_token1);
@@ -387,15 +409,22 @@ public class NetworkHelperUnitTest {
         // User 2 sends friend request to user 1
         NetworkHelper.AddFriend(username1, access_token2);
 
-        // User 1 accepts user 2's friend request
-        NetworkHelper.AddFriend(username2, access_token1);
+        // User 1 gets incoming friend requests
+        HashMap<String, String> user1map = NetworkHelper.
+                GetIncomingFriendRequests(access_token1);
+
+        // Gets the friendship token associated with user 2
+        String user1_friendship_token = user1map.get(username2);
+
+        // User 1 accepts friend request of user 2
+        NetworkHelper.AcceptFriend(user1_friendship_token, access_token1);
 
         // User 1 removes user 2 as a friends
-        NetworkHelper.RemoveFriend(username2, access_token1);
+        System.out.println(NetworkHelper.RemoveFriend(username2, access_token1));
 
-        // Check that both user now have no friends
+        // Check that both users now have no friends
         if (NetworkHelper.GetFriends(access_token1).size() != 0) throw new AssertionError();
-        if (NetworkHelper.GetFriends(access_token1).size() != 0) throw new AssertionError();
+        if (NetworkHelper.GetFriends(access_token2).size() != 0) throw new AssertionError();
     }
 
     // Tests that other users can't accept friend requests
@@ -417,9 +446,9 @@ public class NetworkHelperUnitTest {
         // User 2 sends friend request to user 1
         NetworkHelper.AddFriend(username1, access_token2);
 
-        // Check that the incoming friend request is there
-        ArrayList<ArrayList<String>> out = NetworkHelper.GetIncomingFriendRequests(access_token1);
-        if (!out.get(0).get(0).toString().equals(username2)) throw new AssertionError();
+        HashMap<String, String> out = NetworkHelper.GetIncomingFriendRequests(access_token1);
+
+        if (!out.keySet().contains(username2)) throw new AssertionError();
     }
 
     @Test
