@@ -186,7 +186,8 @@ public class NetworkHelperUnitTest {
 
         // Register second user
         String username2 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username2, "test_password", "test_avatar_url", "usr2_desc");
+        NetworkHelper.Register(username2, "test_password", "test_avatar_url",
+                "usr2_desc");
 
         String response = NetworkHelper.GetProfile(username2, access_token1);
 

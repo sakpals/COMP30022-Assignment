@@ -40,8 +40,10 @@ public final class NetworkHelper {
     private static final Integer SERVER_PORT = 5000;
     private static final String JSON_HEADER_NAME = "content-type";
     private static final String ACCESS_TOKEN_NAME = "access_token";
-    private static final String JSON_HEADER_VALUE = "application/json; charset=utf-8";
-    private static final MediaType JSON = MediaType.parse("Content-Type: application/json");
+    private static final String JSON_HEADER_VALUE = "application/json; " +
+            "charset=utf-8";
+    private static final MediaType JSON = MediaType.parse("Content-Type: " +
+            "application/json");
     private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
     private static final String USER_LOGIN = "user/login";
     private static final String USER_LOGOUT = "user/logout";
@@ -62,19 +64,23 @@ public final class NetworkHelper {
 
 
     /**
-     * Registers a user in the database, for now the user MUST enter all paramaters
+     * Registers a user in the database, for now the user MUST enter all
+     * paramaters
      *
-     * @param username The username that the user wishes to use, must not already be registered
-     *                 and TODO: must make sure the username is of correct format e.g. no invalid chars
+     * @param username The username that the user wishes to use, must not
+     *                 already be registered
+     *                 and
      * @param password The user chooses a password
      * @param avatar_url The user chooses an avatar_url
      * @param description The user chooses a description
      * @return The http message the server sends in response to this request
      */
-    public static String Register(String username, String password, String avatar_url, String description) {
+    public static String Register(String username, String password,
+                                  String avatar_url, String description) {
         final OkHttpClient client = new OkHttpClient();
 
-        RequestBody body =  createBodyRequest(new String [] {"password", password},
+        RequestBody body =  createBodyRequest(new String []
+                        {"password", password},
                 new String [] {"avatar_url", avatar_url},
                 new String [] {"description", description},
                 new String [] {"username", username});
@@ -116,7 +122,8 @@ public final class NetworkHelper {
     public static String Login(String username, String password) {
         final OkHttpClient client = new OkHttpClient();
 
-        RequestBody body =  createBodyRequest(new String [] {"username", username},
+        RequestBody body =  createBodyRequest(new String []
+                        {"username", username},
                 new String [] {"password", password});
 
         HttpUrl url = new HttpUrl.Builder()
@@ -189,20 +196,25 @@ public final class NetworkHelper {
      *
      * @param username The users username
      * @param password The users password
-     * @param avatar_url NOT CURRENTLY WORKING, but is the url the user wants to change it to
+     * @param avatar_url NOT CURRENTLY WORKING, but is the url the user wants
+     *                   to change it to
      * @param description The new description the user wants on their profile
      * @param access_token Users access token recieved at login
      * @return The http message the server sends in response to this request
      */
-    public static String UpdateProfile(String username, String password, String avatar_url, String description, String access_token) {
+    public static String UpdateProfile(String username, String password,
+                                       String avatar_url, String description,
+                                       String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        RequestBody body =  createBodyRequest(new String [] {"description", description});
+        RequestBody body =  createBodyRequest(new String []
+                {"description", description});
 
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
-        HttpUrl url = constructURL(USER_UPDATE_PROFILE + username, access_token);
+        HttpUrl url = constructURL(USER_UPDATE_PROFILE + username,
+                access_token);
 
         Request request = new Request.Builder()
                 .addHeader(JSON_HEADER_NAME, JSON_HEADER_VALUE)
@@ -224,9 +236,10 @@ public final class NetworkHelper {
      * Allows a user to get the profile of any other registered user
      *
      * @param username Any users username in the database
-     * @param access_token The current users username, does not need to be the one
-     *                     assoicaed with username
-     * @return The description of the profile for the user inputted as the username paramater
+     * @param access_token The current users username, does not need to be the
+     *                     one assoicaed with username
+     * @return The description of the profile for the user inputted as the
+     * username paramater
      */
     public static String GetProfile(String username, String access_token) {
         final OkHttpClient client = new OkHttpClient();
@@ -234,7 +247,8 @@ public final class NetworkHelper {
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
-        HttpUrl url = constructURL(USER_UPDATE_PROFILE + username, access_token);
+        HttpUrl url = constructURL(USER_UPDATE_PROFILE + username,
+                access_token);
 
         Request request = new Request.Builder()
                 .url(url)
@@ -278,7 +292,8 @@ public final class NetworkHelper {
      * @param access_token Current user access token
      * @return The http message the server sends in response to this request
      */
-    public static String UpdateLocation(String username, String lat, String lon, String access_token) {
+    public static String UpdateLocation(String username, String lat, String lon,
+                                        String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
         RequestBody body =  createBodyRequest(new String [] {"lat", lat},
@@ -314,7 +329,8 @@ public final class NetworkHelper {
      * @return A 2 element string array containing distance and direction
      * respectively
      */
-    public static String[] RetrieveLocation(String username, String access_token) {
+    public static String[] RetrieveLocation(String username,
+                                            String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
         // Remove quotation marks so it is in the correct format for okhttp3
@@ -362,7 +378,8 @@ public final class NetworkHelper {
     /**
      *
      * @param username The username of the user you want to add
-     * @param access_token The current users access token (not the target users)
+     * @param access_token The current users access token (not the target
+     *                     users)
      * @return The http message the server sends in response to this request
      */
     public static String AddFriend(String username, String access_token) {
@@ -400,7 +417,8 @@ public final class NetworkHelper {
      *                     friend request
      * @return The http message the server sends in response to this request
      */
-    public static String AcceptFriend(String friendship_token, String access_token) {
+    public static String AcceptFriend(String friendship_token,
+                                      String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
         // Create an empty body
@@ -409,7 +427,8 @@ public final class NetworkHelper {
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
-        HttpUrl url = constructURL(FRIEND_ACCEPT + friendship_token, access_token);
+        HttpUrl url = constructURL(FRIEND_ACCEPT + friendship_token,
+                access_token);
 
         Request request = new Request.Builder()
                 .url(url)
@@ -462,7 +481,8 @@ public final class NetworkHelper {
         try {
             // Extract description from JSON String
             JSONObject jsonobject = new JSONObject(jsonData);
-            return jsonProfilesToArrayList(jsonobject, new String[] {"username", "description"}, "profile", "friends");
+            return jsonProfilesToArrayList(jsonobject, new String[]
+                    {"username", "description"}, "profile", "friends");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -543,13 +563,18 @@ public final class NetworkHelper {
             if (jsonobject.get("requests").toString().equals("[]")) return null;
 
             // Get all usernames and tokens
-            ArrayList<ArrayList<String>> userslst = jsonProfilesToArrayList(jsonobject, new String[] {"username"}, "profile", "requests");
-            ArrayList<ArrayList<String>> tokenslst = jsonProfilesToArrayList(jsonobject, new String[] {"token"}, "token", "requests");
+            ArrayList<ArrayList<String>> userslst =jsonProfilesToArrayList(
+                    jsonobject, new String[] {"username"}, "profile",
+                    "requests");
+            ArrayList<ArrayList<String>> tokenslst = jsonProfilesToArrayList(
+                    jsonobject, new String[] {"token"}, "token", "requests");
 
-            // Put these user tokens in a hashmap with key:username, value:token
+            // Put these user tokens in a hashmap with key:username,
+            // value:token
             HashMap<String, String> usertokens = new HashMap<>();
             for (int i=0; i<userslst.size(); i++){
-                usertokens.put(userslst.get(i).get(0), tokenslst.get(i).get(0));
+                usertokens.put(userslst.get(i).get(0), tokenslst.get(i)
+                        .get(0));
             }
 
             return usertokens;
@@ -602,7 +627,8 @@ public final class NetworkHelper {
             // Returns null if there are no outgoing requests
             if (jsonobject.get("requests").toString().equals("[]")) return null;
 
-            return jsonProfilesToArrayList(jsonobject, new String[] {"username"}, "profile", "requests");
+            return jsonProfilesToArrayList(jsonobject, new String[] {"username"},
+                    "profile", "requests");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -681,7 +707,8 @@ public final class NetworkHelper {
                                                                          String jsonType,
                                                                          String jsonSubType){
 
-        ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>(attrs.length);
+        ArrayList<ArrayList<String>> output =
+                new ArrayList<ArrayList<String>>(attrs.length);
 
         try {
             // Get the profile for ONE user
@@ -706,7 +733,8 @@ public final class NetworkHelper {
                 // Extract values from each attribute from the profile
                 for (int j=0; j<attrs.length; j++){
                     if (profileContents.getString(attrs[j]) != null){
-                        line.add(profileContents.getString(attrs[j]).toString());
+                        line.add(profileContents.getString(attrs[j])
+                                .toString());
                     }
                 }
                 output.add(line);
