@@ -52,7 +52,7 @@ public class NetworkHelperUnitTest {
         // Try to register again
         response = NetworkHelper.Register(username, "test_password",
                 "test_avatar_url", "test_description");
-        if (response.equals("500"))
+        if (!response.equals("500"))
             throw new AssertionError(likelyerror);
     }
 
@@ -107,9 +107,13 @@ public class NetworkHelperUnitTest {
         String response = NetworkHelper.Logout(access_token);
         if (!response.equals("200")) throw new AssertionError(response);
 
-        // Checks if other logouts work whilst already logged out
+        response = NetworkHelper.Logout(access_token);
+
+        // Checks if logout works whilst already logged out
         // Will return error if logout works as planned
-        if (!response.equals("200")) throw new AssertionError(response);
+        if (response.equals("200")) throw new AssertionError(response);
+
+        response = NetworkHelper.Logout(access_token);
 
         // Will return an error if the server doesn't correctly return
         // internal error (500) when logout is attempted again
@@ -333,10 +337,10 @@ public class NetworkHelperUnitTest {
         String username2 = UUID.randomUUID().toString();
         NetworkHelper.Register(username2, "test_password", "test_avatar_url",
                 "usr2_desc");
-        String access_token2 = NetworkHelper.Login(username1, "test_password");
+        String access_token2 = NetworkHelper.Login(username2, "test_password");
 
         String response = NetworkHelper.AddFriend(username1, access_token2);
-        if (!response.equals("200")) throw new AssertionError(response);
+        if (!response.equals("201")) throw new AssertionError(response);
     }
 
 
