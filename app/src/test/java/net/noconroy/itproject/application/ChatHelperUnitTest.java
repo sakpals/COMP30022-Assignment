@@ -31,14 +31,14 @@ public class ChatHelperUnitTest {
     @Test
     public void CreateChannelTest() {
         String channel_name = UUID.randomUUID().toString();
-        if (!ChatHelper.CreateChannel(channel_name, access_token).equals("201"))
+        if (!ChatHelper.CreateChannel(channel_name, access_token, true).equals("201"))
             throw new AssertionError();
     }
 
     @Test
     public void DeleteChannelTest() {
         String channel_name = UUID.randomUUID().toString();
-        ChatHelper.CreateChannel(channel_name, access_token);
+        ChatHelper.CreateChannel(channel_name, access_token, true);
         if (!ChatHelper.DeleteChannel(channel_name, access_token).equals("200"))
             throw new AssertionError();
     }
@@ -46,7 +46,7 @@ public class ChatHelperUnitTest {
     @Test
     public void SubscribeChannelTest() {
         String channel_name = UUID.randomUUID().toString();
-        ChatHelper.CreateChannel(channel_name, access_token);
+        ChatHelper.CreateChannel(channel_name, access_token, true);
         if (!ChatHelper.SubscribeChannel(channel_name, access_token2).equals("200"))
             throw new AssertionError();
     }
@@ -54,7 +54,7 @@ public class ChatHelperUnitTest {
     @Test
     public void LeaveChannelTest() {
         String channel_name = UUID.randomUUID().toString();
-        ChatHelper.CreateChannel(channel_name, access_token);
+        ChatHelper.CreateChannel(channel_name, access_token, true);
         ChatHelper.SubscribeChannel(channel_name, access_token2);
         if (!ChatHelper.LeaveChannel(channel_name, access_token2).equals("200"))
             throw new AssertionError();
@@ -63,7 +63,7 @@ public class ChatHelperUnitTest {
     @Test
     public void MessageChannelTest() {
         String channel_name = UUID.randomUUID().toString();
-        ChatHelper.CreateChannel(channel_name, access_token);
+        ChatHelper.CreateChannel(channel_name, access_token, true);
         ChatHelper.SubscribeChannel(channel_name, access_token2);
         if (!ChatHelper.MessageChannel(channel_name, "test_message", access_token2).equals("200"))
             throw new AssertionError();
@@ -72,26 +72,8 @@ public class ChatHelperUnitTest {
     @Test
     public void ListenChannelsTest() {
         String channel_name = UUID.randomUUID().toString();
-        ChatHelper.CreateChannel(channel_name, access_token);
+        ChatHelper.CreateChannel(channel_name, access_token, true);
         ChatHelper.SubscribeChannel(channel_name, access_token2);
         ChatHelper.ListenChannels(access_token2);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
