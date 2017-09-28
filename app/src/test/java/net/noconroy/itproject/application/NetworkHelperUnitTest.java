@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 public class NetworkHelperUnitTest {
 
@@ -54,8 +57,8 @@ public class NetworkHelperUnitTest {
 
         String response = NetworkHelper.Register(username, test_password,
                 test_avatar_url, test_description);
-        if (!isAccepted(response))
-            throw new AssertionError(response);
+
+        assertTrue(isAccepted(response));
     }
 
 
@@ -169,9 +172,10 @@ public class NetworkHelperUnitTest {
 
         String response = NetworkHelper.GetProfile(username, access_token);
 
-        if (!response.equals(test_description))
-            throw new AssertionError(response);
+        //if (!response.equals(test_description))
+          //  throw new AssertionError(response);
 
+        assertEquals(response, test_description);
     }
 
 
@@ -191,8 +195,7 @@ public class NetworkHelperUnitTest {
 
         String response = NetworkHelper.GetProfile(username, access_token);
 
-        if (!response.equals(test_description2))
-            throw new AssertionError(response);
+        assertEquals(response, test_description2);
     }
 
 
@@ -213,9 +216,7 @@ public class NetworkHelperUnitTest {
 
         String response = NetworkHelper.GetProfile(username2, access_token1);
 
-        // Tests that first user can access profile of second user
-        if (!response.equals(test_description1))
-            throw new AssertionError(response);
+        assertEquals(response, test_description1);
     }
 
 
@@ -235,15 +236,16 @@ public class NetworkHelperUnitTest {
                 test_description2);
         String access_token2 = NetworkHelper.Login(username1, test_password);
 
-        // These will return an error if a user succesfully alters another users profile
+        // User 2 tries to update user 1's profile
         String response = NetworkHelper.UpdateProfile(username1,
-                wrong_password, test_avatar_url, test_description1, access_token2);
+                wrong_password, test_avatar_url, test_description2, access_token2);
 
         // Throw error if the server accepts this
         if (isAccepted(response)) throw new AssertionError(response);
 
-        if (response.equals(test_description1))
-            throw new AssertionError(response);
+        // If the value was successfully changed (which the server shouldn't
+        // let happen)
+        assertEquals(response, test_description2);
     }
 
 
