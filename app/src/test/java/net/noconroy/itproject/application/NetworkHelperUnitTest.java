@@ -37,7 +37,7 @@ public class NetworkHelperUnitTest {
     private final String test_lon1 = "15";
     private final String test_lat2 = "20";
     private final String test_lon2 = "30";
-    
+
 
     // Error messages
     private final String username_already_exists_error = "You're most" +
@@ -346,7 +346,7 @@ public class NetworkHelperUnitTest {
         // server allows this to occur
         NetworkHelper.UpdateLocation(username1, test_lat1, test_lon1, access_token1);
 
-        String response = NetworkHelper.UpdateLocation(username1, test_lat2, test_lat2,
+        String response = NetworkHelper.UpdateLocation(username1, test_lat2, test_lon2,
                 access_token2);
         if (isAccepted(response)) throw new AssertionError(response);
 
