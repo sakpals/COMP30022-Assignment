@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
 
 
 public class NetworkHelperUnitTest {
@@ -57,8 +57,8 @@ public class NetworkHelperUnitTest {
 
         String response = NetworkHelper.Register(username, test_password,
                 test_avatar_url, test_description);
-
-        assertTrue(isAccepted(response));
+        if (!isAccepted(response))
+            throw new AssertionError(response);
     }
 
 
