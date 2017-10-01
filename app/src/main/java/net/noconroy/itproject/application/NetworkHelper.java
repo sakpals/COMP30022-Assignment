@@ -504,7 +504,10 @@ public final class NetworkHelper {
 
         // Create an empty body
         RequestBody body = RequestBody.create(null, new byte[0]);
-
+        
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = removeQuotations(access_token);
+        
         HttpUrl url = constructURL(FRIEND_REMOVE + username, access_token);
 
         Request request = new Request.Builder()
