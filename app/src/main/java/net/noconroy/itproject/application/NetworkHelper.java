@@ -49,7 +49,7 @@ public final class NetworkHelper {
     private static final String USER_LOGOUT = "user/logout";
     private static final String USER_REGISTER = "user/register";
     private static final String USER_UPDATE_PROFILE = "profile/";
-    private static final String FRIEND_LIST = "/friends";
+    private static final String FRIEND_LIST = "friends";
     private static final String FRIEND_ADD = "friends/add/";
     private static final String FRIEND_ACCEPT = "friends/accept/";
     private static final String FRIEND_REMOVE = "friends/remove/";
