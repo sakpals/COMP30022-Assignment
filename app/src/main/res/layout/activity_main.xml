@@ -8,23 +8,6 @@
     tools:layout_editor_absoluteY="81dp"
     tools:layout_editor_absoluteX="0dp">
 
-    <EditText
-        android:id="@+id/Friends_List_Title"
-        style="@style/Widget.AppCompat.EditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/transparent"
-        android:ems="10"
-        android:gravity="center"
-        android:hint="@string/title_friends_list"
-        android:inputType="textPersonName"
-        android:selectAllOnFocus="false"
-        android:singleLine="false"
-        android:text="@string/title_friends_list"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/CameraButton"
@@ -34,8 +17,9 @@
         android:layout_marginRight="16dp"
         android:onClick="camera"
         android:text="@string/camera"
-        app:layout_constraintBaseline_toBaselineOf="@+id/AddFriendButton"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/LoginButton"
@@ -45,29 +29,10 @@
         android:layout_marginStart="16dp"
         android:onClick="login"
         android:text="@string/login"
-        app:layout_constraintBaseline_toBaselineOf="@+id/AddFriendButton"
-        app:layout_constraintLeft_toLeftOf="parent" />
-
-    <Button
-        android:id="@+id/AddFriendButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:onClick="addFriend"
-        android:text="@string/add_friend"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:id="@+id/FriendsList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Temp: Add friends list here"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Friends_List_Title" />
 
     <Button
         android:id="@+id/Registerbutton"
@@ -79,5 +44,15 @@
         android:text="@string/register"
         app:layout_constraintBottom_toTopOf="@+id/LoginButton"
         app:layout_constraintLeft_toLeftOf="parent" />
+
+    <Button
+        android:id="@+id/FriendsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Friends"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp" />
 
 </android.support.constraint.ConstraintLayout>
