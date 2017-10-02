@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
         String access_token = intent.getStringExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE);
-
+        this.access_token = access_token;
         if (access_token != null){
 
             // Hide register button
@@ -29,8 +30,16 @@ public class MainActivity extends AppCompatActivity {
             Button loginButton = (Button) findViewById(R.id.LoginButton);
             loginButton.setText("Logged in");
 
-            // Disable logging in, as you're alraedy logged
+            // Disable logging in, as you're already logged
             loginButton.setEnabled(false);
+
+            Button friendsButton = (Button) findViewById(R.id.FriendsButton);
+            friendsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    friends(view);
+                }
+            });
         }
     }
 
@@ -49,8 +58,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void addFriend(View view){
-        Intent intent = new Intent(this, AddFriendActivity.class);
+    public void friends(View view) {
+        Intent intent = new Intent(MainActivity.this, Friends.class);
+        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
         startActivity(intent);
     }
+
 }
