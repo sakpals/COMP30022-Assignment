@@ -171,7 +171,7 @@ public class LoginActivity extends AppCompatActivity {
 
         private final String mEmail;
         private final String mPassword;
-        private String access_token;
+        private String access_token = null;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -185,9 +185,13 @@ public class LoginActivity extends AppCompatActivity {
 
             // TODO: Make more general rejection for when server is down
 
-            if (!access_token.equals("500")) return true;
+            if (!access_token.equals("500")) {
+                return true;
+            }
+            else {
+                return false;
+            }
 
-            return false;
         }
 
         @Override
