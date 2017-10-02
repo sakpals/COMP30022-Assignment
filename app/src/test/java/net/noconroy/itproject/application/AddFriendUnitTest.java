@@ -71,9 +71,6 @@ public class AddFriendUnitTest {
             e.printStackTrace();
         }
 
-
-
-
     }
 
     /* checks that access token is being generated */
