@@ -36,7 +36,7 @@ public final class NetworkHelper {
     /************************************************************************/
 
     private static final String SERVER_SCHEME = "http";
-    private static final String SERVER_HOST = "127.0.0.1";
+    private static final String SERVER_HOST ="127.0.0.1";
     private static final Integer SERVER_PORT = 5000;
     private static final String JSON_HEADER_NAME = "content-type";
     private static final String ACCESS_TOKEN_NAME = "access_token";
@@ -49,7 +49,7 @@ public final class NetworkHelper {
     private static final String USER_LOGOUT = "user/logout";
     private static final String USER_REGISTER = "user/register";
     private static final String USER_UPDATE_PROFILE = "profile/";
-    private static final String FRIEND_LIST = "/friends";
+    private static final String FRIEND_LIST = "friends";  // removed an unecessary extra '/' for URL building
     private static final String FRIEND_ADD = "friends/add/";
     private static final String FRIEND_ACCEPT = "friends/accept/";
     private static final String FRIEND_REMOVE = "friends/remove/";
@@ -504,6 +504,9 @@ public final class NetworkHelper {
 
         // Create an empty body
         RequestBody body = RequestBody.create(null, new byte[0]);
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = removeQuotations(access_token);
 
         HttpUrl url = constructURL(FRIEND_REMOVE + username, access_token);
 
