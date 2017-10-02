@@ -126,10 +126,11 @@ public class RegisterActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
 
             String response = NetworkHelper.Register(mUsername, mPassword, "", "No Description");
-
             access_token = NetworkHelper.Login(mUsername, mPassword);
 
-            if (response.equals("201")) return true;
+            if(response.equals("201")) {
+                return true;
+            }
 
             return false;
         }
