@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:layout_editor_absoluteY="0dp"
+    tools:layout_editor_absoluteX="0dp">
+
+
+        <com.example.mattias.devicelocation.testcameraiew
+            android:id="@+id/cameraSurfaceView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            />
+
+        <com.example.mattias.devicelocation.CompassSurfaceView
+            android:id="@+id/compassSurfaceView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            />
+</FrameLayout>
+
