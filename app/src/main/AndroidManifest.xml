@@ -53,7 +53,8 @@
                 android:value=".MainActivity" />
         </activity>
         <activity android:name=".Friends" />
-        <activity android:name=".FriendRequestsActivity"></activity>
+        <activity android:name=".FriendRequestsActivity" />
+        <activity android:name=".LogoutActivity"></activity>
     </application>
 
 </manifest>
