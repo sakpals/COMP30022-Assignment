@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import net.noconroy.itproject.application.AR.CameraPreview;
+
 /**
  * Created by sampadasakpal on 15/9/17.
  */

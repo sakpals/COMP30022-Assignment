@@ -179,9 +179,7 @@ public class LocationService extends Service {
                 // If we currently have a timer active -- extending location updates
                 if (extendedLocationTimer > 0) {
                     Date currentDate = new Date();
-                    Log.d(TAG, String.valueOf(extendedLocationTimer));
                     extendedLocationTimer -= ((currentDate.getTime() - clickedLastUpdateTime.getTime()) / 1000);
-                    Log.d(TAG, String.valueOf(extendedLocationTimer));
                     clickedLastUpdateTime = currentDate;
                 }
 
@@ -262,7 +260,12 @@ public class LocationService extends Service {
 
         if (mCurrentLocation != null && mRequestingLocationUpdates) {
             Log.i(TAG, "Location has been updated.");
+
             // At this point we would be sending user location data to the server
+            // SEND LOCATION INFORMATION TO SERVER
+            // mCurrentLocation.getLongitude()
+            // mCurrentLocation.getLatitude()
+
         }
         else if (mCurrentLocation == null) {
             Log.i(TAG, "mCurrentLocation is currently null.");
