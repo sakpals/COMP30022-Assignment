@@ -560,13 +560,14 @@ public class NetworkHelperUnitTest {
     // Test that removing a friend works
     @Test
     public void RemoveFriendTest() throws Exception {
-        // Register user 1 first
+
+        // Register and login user 1 first
         String username1 = UUID.randomUUID().toString();
         NetworkHelper.Register(username1, test_password, test_avatar_url,
                 test_description);
         String access_token1 = NetworkHelper.Login(username1, test_password);
 
-        // Register and Login user 2
+        // Register and login user 2
         String username2 = UUID.randomUUID().toString();
         NetworkHelper.Register(username2, test_password, test_avatar_url,
                 test_description);
@@ -592,7 +593,6 @@ public class NetworkHelperUnitTest {
         // Check that both users now have no friends
         if (NetworkHelper.GetFriends(access_token1).size() != 0)
             throw new AssertionError(response);
-
         if (NetworkHelper.GetFriends(access_token2).size() != 0)
             throw new AssertionError(response);
     }
@@ -601,14 +601,14 @@ public class NetworkHelperUnitTest {
     // Cheks that a user can successfully view their incoming friend requests
     @Test
     public void GetIncomingFriendRequestsTest() throws Exception {
-        // Register and Login user 1 first
-        String username1 = UUID.randomUUID().toString();
 
+        // Register and login user 1 first
+        String username1 = UUID.randomUUID().toString();
         NetworkHelper.Register(username1, test_password, test_avatar_url,
                 test_description2);
         String access_token1 = NetworkHelper.Login(username1, test_password);
 
-        // Register and Login user 2
+        // Register and login user 2
         String username2 = UUID.randomUUID().toString();
         NetworkHelper.Register(username2, test_password, test_avatar_url,
                 test_description2);
@@ -635,14 +635,14 @@ public class NetworkHelperUnitTest {
     // Checks a users outgoing friend requests
     @Test
     public void GetOutgoingFriendRequestsTest() throws Exception {
-        // Register user 1 first
-        String username1 = UUID.randomUUID().toString();
 
+        // Register and login user 1 first
+        String username1 = UUID.randomUUID().toString();
         NetworkHelper.Register(username1, test_password, test_avatar_url,
                 test_description2);
         String access_token1 = NetworkHelper.Login(username1, test_password);
 
-        // Register and Login user 2
+        // Register and login user 2
         String username2 = UUID.randomUUID().toString();
         NetworkHelper.Register(username2, test_password, test_avatar_url,
                 test_description2);
