@@ -26,12 +26,23 @@ public class MainActivity extends AppCompatActivity {
             Button registerButton = (Button) findViewById(R.id.Registerbutton);
             registerButton.setVisibility(View.GONE);
 
+
+            // change this to a logout button
+
             // Change text of Login button
             Button loginButton = (Button) findViewById(R.id.LoginButton);
-            loginButton.setText("Logged in");
+            //loginButton.setText("Logged in");
+            loginButton.setText("Log out");
 
             // Disable logging in, as you're already logged
-            loginButton.setEnabled(false);
+            //loginButton.setEnabled(false);
+
+            loginButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    logout(view);
+                }
+            });
 
             Button friendsButton = (Button) findViewById(R.id.FriendsButton);
             friendsButton.setOnClickListener(new View.OnClickListener() {
@@ -42,7 +53,11 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
-
+    public void logout(View view) {
+        Intent intent = new Intent(this, LogoutActivity.class);
+        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
+        startActivity(intent);
+    }
     public void register(View view){
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
