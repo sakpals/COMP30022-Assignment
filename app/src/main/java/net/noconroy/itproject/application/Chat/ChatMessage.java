@@ -25,31 +25,24 @@ public class ChatMessage {
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
-
     public String getMessage() {
         return message;
     }
-
     public void setMessage(String message) {
         this.message = message;
     }
-
     public String getMessageDate() {
         return messageDate;
     }
-
     public void setMessageDate(String messageDate) {
         this.messageDate = messageDate;
     }
-
     public boolean isMe() {
         return isMe;
     }
-
     public void setMe(boolean me) {
         isMe = me;
     }

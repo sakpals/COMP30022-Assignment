@@ -32,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void startChat(View view) {
         Intent intent = new Intent(this, ChatActivity.class);
+
+        // Change this in order to add the users id and name from server
+        Bundle userClickedOn = new Bundle();
+        userClickedOn.putString("id", "1");         // replace with proper id
+        userClickedOn.putString("name", "bob");     // replace with proper name etc.
+        intent.putExtras(userClickedOn);
+
         startActivity(intent);
     }
 }

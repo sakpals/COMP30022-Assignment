@@ -16,6 +16,8 @@ import java.util.Date;
 
 /**
  * Created by Mattias on 5/10/2017.
+ * Basic functionality for ChatActivity was sourced from:
+ *      https://www.codeproject.com/Tips/897826/Designing-Android-Chat-Bubble-Chat-UI
  */
 
 public class ChatActivity extends AppCompatActivity {
@@ -27,17 +29,27 @@ public class ChatActivity extends AppCompatActivity {
     private EditText textInput;
     private ListView messageList;
 
+    // Refers to the ID and NAME of the current user we're interacting with in the chat
+    private String userClickedOnId;
+    private String userClickedOnName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        // Retrieve information from extra bundle
+        userClickedOnName = getIntent().getExtras().getString("name");
+        userClickedOnId = getIntent().getExtras().getString("id");
+
         setView();
 
         // Create a new chat adapter and backlog and load history
         chatMessages = new ArrayList<ChatMessage>();
-        loadHistory(chatMessages);
+        loadServerHistory(chatMessages);
         chatAdapter = new ChatAdapter(ChatActivity.this, chatMessages);
         messageList.setAdapter(chatAdapter);
+
     }
 
     @Override
@@ -74,13 +86,13 @@ public class ChatActivity extends AppCompatActivity {
                 // Remove whatever we had in our edit text box
                 textInput.setText("");
                 sendMessage(message);
+                dummyData();
             }
         });
     }
 
-    // Would make a request to server to get all previous messages
-    // sent between the two users
-    private void loadHistory(ArrayList<ChatMessage> chatMessages) {
+    // Would make a request to server to get all previous messages sent between the two users
+    private void loadServerHistory(ArrayList<ChatMessage> chatMessages) {
         ;
     }
 
@@ -88,6 +100,24 @@ public class ChatActivity extends AppCompatActivity {
         chatAdapter.add(message);
         chatAdapter.notifyDataSetChanged();
         scrollListView();
+    }
+
+    private void dummyData() {
+        ChatMessage m1 = new ChatMessage(
+                "2",
+                "Hello darkness my old friend",
+                DateFormat.getDateTimeInstance().format(new Date()),
+                false
+        );
+        ChatMessage m2 = new ChatMessage(
+                "2",
+                "are you well?",
+                DateFormat.getDateTimeInstance().format(new Date()),
+                false
+        );
+
+        sendMessage(m1);
+        sendMessage(m2);
     }
 
     private void scrollListView() {

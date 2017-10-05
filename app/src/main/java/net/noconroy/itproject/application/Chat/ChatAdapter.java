@@ -17,6 +17,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Mattias on 5/10/2017.
+ * Basic functionality for ChatAdapter was sourced from:
+ *      https://www.codeproject.com/Tips/897826/Designing-Android-Chat-Bubble-Chat-UI
  */
 
 public class ChatAdapter extends BaseAdapter {
@@ -48,12 +50,6 @@ public class ChatAdapter extends BaseAdapter {
     @Override
     public long getItemId(int i) {
         return i;
-        /*
-        if (chatMessages != null) {
-            return Long.getLong(chatMessages.get(i).getId());
-        }
-        return -1;
-        */
     }
 
     @Override
@@ -70,55 +66,28 @@ public class ChatAdapter extends BaseAdapter {
             holder = (ViewHolder)view.getTag();
         }
 
-        boolean myMsg = chatMessage.isMe();
-        setAlignment(holder, myMsg);
-        holder.txtMessage.setText(chatMessage.getMessage());
-        holder.txtInfo.setText(chatMessage.getMessageDate());
+        setMessagePositioning(holder, chatMessage.isMe());
+        holder.message.setText(chatMessage.getMessage());
+        holder.date.setText(chatMessage.getMessageDate());
 
         return view;
     }
 
-    private void setAlignment(ViewHolder holder, boolean isMe) {
-        if (!isMe) {
-            // holder.contentWithBG.setBackgroundResource(R.drawable.in_message_bg);
+    private void setMessagePositioning(ViewHolder holder, boolean isMe) {
 
-            LinearLayout.LayoutParams layoutParams =
-                    (LinearLayout.LayoutParams) holder.contentWithBG.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            holder.contentWithBG.setLayoutParams(layoutParams);
-
-            RelativeLayout.LayoutParams lp =
-                    (RelativeLayout.LayoutParams) holder.content.getLayoutParams();
+        if (isMe) {
+            holder.messageBackground.setBackgroundResource(R.drawable.bubble2);
+            holder.content.setGravity(Gravity.RIGHT);
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.content.getLayoutParams();
             lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
             lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            holder.content.setLayoutParams(lp);
-            layoutParams = (LinearLayout.LayoutParams) holder.txtMessage.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            holder.txtMessage.setLayoutParams(layoutParams);
-
-            layoutParams = (LinearLayout.LayoutParams) holder.txtInfo.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            holder.txtInfo.setLayoutParams(layoutParams);
-        } else {
-            // holder.contentWithBG.setBackgroundResource(R.drawable.out_message_bg);
-
-            LinearLayout.LayoutParams layoutParams =
-                    (LinearLayout.LayoutParams) holder.contentWithBG.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            holder.contentWithBG.setLayoutParams(layoutParams);
-
-            RelativeLayout.LayoutParams lp =
-                    (RelativeLayout.LayoutParams) holder.content.getLayoutParams();
+        }
+        else {
+            holder.messageBackground.setBackgroundResource(R.drawable.bubble1);
+            holder.content.setGravity(Gravity.LEFT);
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.content.getLayoutParams();
             lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
             lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            holder.content.setLayoutParams(lp);
-            layoutParams = (LinearLayout.LayoutParams) holder.txtMessage.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            holder.txtMessage.setLayoutParams(layoutParams);
-
-            layoutParams = (LinearLayout.LayoutParams) holder.txtInfo.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            holder.txtInfo.setLayoutParams(layoutParams);
         }
     }
 
@@ -132,17 +101,17 @@ public class ChatAdapter extends BaseAdapter {
 
     private ViewHolder createViewHolder(View v) {
         ViewHolder holder = new ViewHolder();
-        holder.txtMessage = (TextView) v.findViewById(R.id.txtMessage);
-        holder.content = (LinearLayout) v.findViewById(R.id.content);
-        holder.contentWithBG = (LinearLayout) v.findViewById(R.id.contentWithBackground);
-        holder.txtInfo = (TextView) v.findViewById(R.id.txtInfo);
+        holder.message = (TextView)v.findViewById(R.id.message);
+        holder.content = (LinearLayout)v.findViewById(R.id.content);
+        holder.messageBackground = (LinearLayout)v.findViewById(R.id.messageBackground);
+        holder.date = (TextView)v.findViewById(R.id.date);
         return holder;
     }
 
     private static class ViewHolder {
-        public TextView txtMessage;
-        public TextView txtInfo;
+        public TextView message;
+        public TextView date;
         public LinearLayout content;
-        public LinearLayout contentWithBG;
+        public LinearLayout messageBackground;
     }
 }
