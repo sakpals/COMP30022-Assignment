@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import net.noconroy.itproject.application.Chat.ChatActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -25,6 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void addFriend(View view){
         Intent intent = new Intent(this, AddFriendActivity.class);
+        startActivity(intent);
+    }
+
+    public void startChat(View view) {
+        Intent intent = new Intent(this, ChatActivity.class);
         startActivity(intent);
     }
 }
