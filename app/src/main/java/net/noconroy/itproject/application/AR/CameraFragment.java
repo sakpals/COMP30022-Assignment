@@ -1,4 +1,4 @@
-package net.noconroy.itproject.application;
+package net.noconroy.itproject.application.AR;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -12,10 +12,11 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import net.noconroy.itproject.application.AR.CameraPreview;
+import net.noconroy.itproject.application.R;
 
 /**
  * Created by sampadasakpal on 15/9/17.
+ * NOTE: Currently not in use for the camera application.
  */
 @SuppressWarnings( "deprecation")
 public class CameraFragment extends Fragment {

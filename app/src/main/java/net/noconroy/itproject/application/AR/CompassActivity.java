@@ -1,10 +1,12 @@
-package net.noconroy.itproject.application;
+package net.noconroy.itproject.application.AR;
 
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+
+import net.noconroy.itproject.application.R;
 
 /**
  * Created by Mattias on 5/09/2017.

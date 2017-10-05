@@ -16,6 +16,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import net.noconroy.itproject.application.AR.CompassActivity;
+import net.noconroy.itproject.application.AR.LocationService;
+import net.noconroy.itproject.application.AR.LocationServiceProvider;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();

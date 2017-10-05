@@ -1,4 +1,4 @@
-package net.noconroy.itproject.application;
+package net.noconroy.itproject.application.AR;
 
 import android.content.Context;
 import android.graphics.PixelFormat;

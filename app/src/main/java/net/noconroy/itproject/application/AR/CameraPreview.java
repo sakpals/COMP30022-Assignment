@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Created by sampadasakpal on 15/9/17.
+ * NOTE: Currently not in use as the camera application.
  */
 @SuppressWarnings( "deprecation")
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {

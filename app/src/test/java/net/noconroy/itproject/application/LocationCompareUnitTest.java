@@ -1,15 +1,18 @@
-package com.example.mattias.devicelocation;
+package net.noconroy.itproject.application;
 
 import android.location.Location;
 
+import net.noconroy.itproject.application.AR.LocationCompare;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-//import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+//import org.mockito.junit.MockitoJUnitRunner;
+;
 
 
 /**

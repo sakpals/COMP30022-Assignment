@@ -1,4 +1,4 @@
-package net.noconroy.itproject.application;
+package net.noconroy.itproject.application.AR;
 
 import android.Manifest;
 import android.app.Service;
@@ -27,6 +27,9 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import net.noconroy.itproject.application.AppLifecycleHandler;
+import net.noconroy.itproject.application.MainActivity;
 
 import java.text.DateFormat;
 import java.util.Date;

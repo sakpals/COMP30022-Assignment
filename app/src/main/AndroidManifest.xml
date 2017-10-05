@@ -57,12 +57,12 @@
             android:parentActivityName=".MainActivity" >
         </activity>
 
-        <activity android:name=".CompassActivity"
+        <activity android:name=".AR.CompassActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppNoTitleBar" >
         </activity>
 
-        <service android:name=".LocationService"></service>
+        <service android:name=".AR.LocationService"></service>
     </application>
 
 </manifest>

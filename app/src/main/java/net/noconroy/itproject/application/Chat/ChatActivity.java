@@ -1,7 +1,9 @@
-package net.noconroy.itproject.application;
+package net.noconroy.itproject.application.Chat;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import net.noconroy.itproject.application.R;
 
 /**
  * Created by Mattias on 3/10/2017.

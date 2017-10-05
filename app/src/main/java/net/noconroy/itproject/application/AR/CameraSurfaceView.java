@@ -1,4 +1,4 @@
-package net.noconroy.itproject.application;
+package net.noconroy.itproject.application.AR;
 
 /**
  * Created by Mattias on 26/09/2017.
@@ -16,7 +16,7 @@ import java.util.List;
 
 /** A basic Camera preview class */
 @SuppressWarnings( "deprecation")
-public class testcameraiew extends SurfaceView implements SurfaceHolder.Callback {
+public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "testcameriew";
     private SurfaceHolder mHolder;
     private Camera mCamera;
@@ -30,7 +30,7 @@ public class testcameraiew extends SurfaceView implements SurfaceHolder.Callback
     private Context mContext;
     private SurfaceView mSurfaceView;
 
-    public testcameraiew(Context context, AttributeSet attrs) {
+    public CameraSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
         openCamera();

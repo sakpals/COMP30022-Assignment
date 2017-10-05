@@ -1,4 +1,4 @@
-package net.noconroy.itproject.application;
+package net.noconroy.itproject.application.AR;
 
 /**
  * Created by Mattias on 14/09/2017.

@@ -1,6 +1,4 @@
-package com.example.mattias.devicelocation;
-
-import org.junit.runner.RunWith;
+package net.noconroy.itproject.application;
 
 //import org.mockito.junit.MockitoJUnitRunner;
 

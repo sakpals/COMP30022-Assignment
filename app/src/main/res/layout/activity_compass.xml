@@ -7,13 +7,13 @@
     tools:layout_editor_absoluteY="0dp"
     tools:layout_editor_absoluteX="0dp">
 
-        <net.noconroy.itproject.application.testcameraiew
+        <net.noconroy.itproject.application.AR.CameraSurfaceView
             android:id="@+id/cameraSurfaceView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             />
 
-        <net.noconroy.itproject.application.CompassSurfaceView
+        <net.noconroy.itproject.application.AR.CompassSurfaceView
             android:id="@+id/compassSurfaceView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
