@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtras(userClickedOn);
 
         startActivity(intent);
+    }
 
 
     public void doBindLocationService() {
