@@ -1,19 +1,15 @@
 package net.noconroy.itproject.application;
 
 import android.util.Log;
-
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.junit.Assert.assertTrue;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
-
-import org.mockito.exceptions.verification.NeverWantedButInvoked;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -30,6 +26,9 @@ public class FriendFunctionalityUnitTest {
 
     private static String username1;
     private static String username2;
+    private static String user2_profile_desc = "user_2 profile description";
+    private static String user1_profile_desc = "user_1 profile description";
+
     private static String access_token1 = "r24kj32fkjelwjrklwjerlkewjrlwejrlwjeklrjwe";
     private static String access_token2 = "rejkwj4ljklrewrjlewjreiw042830jlkejrlewjrl";
     private static String password1 = "password1_test";
@@ -39,6 +38,12 @@ public class FriendFunctionalityUnitTest {
     private static HashMap<String, String> user2_friend_requests;
     private static String friendship_token1 = "kltklymejyketkrkrejt9erjtkjretjkerjvkt";
     private static String friendship_token2 = "orepworewllekwrjkvjerjwekrjewkjrklvewj";
+
+    private static ArrayList<ArrayList<String>> user1_friends_list;
+    private static ArrayList<ArrayList<String>> user2_friends_list;
+    private static ArrayList<String> user2_profile;
+    private static ArrayList<String> user1_profile;
+
 
     @Before
     public void setUp() {
@@ -74,6 +79,30 @@ public class FriendFunctionalityUnitTest {
         /* accepting friend requests */
         Mockito.when(NetworkHelper.AcceptFriend(friendship_token1, access_token2)).thenReturn("201", "404", "400");
         Mockito.when(NetworkHelper.AcceptFriend(friendship_token2, access_token1)).thenReturn("201", "404", "400");
+
+        /* For FriendActivity */
+        /* creating user_2 and user_1's profile */
+        user2_profile = new ArrayList<>();
+        user2_profile.add(username2);
+        user2_profile.add(user2_profile_desc);
+
+        user1_profile = new ArrayList<>();
+        user1_profile.add(username1);
+        user1_profile.add(user1_profile_desc);
+
+        /* adding user_1's profile to user_2's friends list */
+        user1_friends_list = new ArrayList<>();
+        user1_friends_list.add(user2_profile);
+
+        /* adding user_2's profile to user_1's friends list */
+        user2_friends_list = new ArrayList<>();
+        user2_friends_list.add(user1_profile);
+
+        Mockito.when(NetworkHelper.GetFriends(access_token1)).thenReturn(user2_friends_list);
+        Mockito.when(NetworkHelper.GetFriends(access_token2)).thenReturn(user1_friends_list);
+
+        Mockito.when(NetworkHelper.RemoveFriend(username1, access_token2)).thenReturn("200", "401");
+        Mockito.when(NetworkHelper.RemoveFriend(username2, access_token1)).thenReturn("200", "401");
     }
 
 
@@ -137,6 +166,7 @@ public class FriendFunctionalityUnitTest {
 
      /* =========================================================================================
      * Tests for FriendRequestsActivity
+     *
      * =========================================================================================*/
 
     /* tests to see whether incoming friend requests returns a request or not */
@@ -238,8 +268,46 @@ public class FriendFunctionalityUnitTest {
 
     /* =========================================================================================
      * Tests for FriendActivity
+     * NOTE: this only simulates what is to be expected from FriendActivity.
      * =========================================================================================*/
-    // MORE TO COME...
+
+
+    /* Checks that a user is able to retrieve their friends list */
+    @Test
+    public void testGetFriendsList() {
+        assertTrue(NetworkHelper.GetFriends(access_token1).equals(user2_friends_list));
+        assertTrue(NetworkHelper.GetFriends(access_token2).equals(user1_friends_list));
+    }
+
+    /* Checks to see that once a user removes a friend, then that friend is no longer in
+    * their friends list.
+    * NOTE: in this case each user (and for the purpose of this test, user_1) has only one
+    * friend. */
+    @Test
+    public void testRemoveFriendFromFriendsList() {
+        String response = NetworkHelper.RemoveFriend(username2, access_token1);
+        assertTrue(response.equals("200"));
+
+        removeFriendFromList(user1_friends_list, username2);
+        String response2 = NetworkHelper.RemoveFriend(username2, access_token1);
+        assertTrue(response2.equals("401"));
+        assertTrue(user1_friends_list.size() == 0);
+
+
+    }
+
+    /**
+     * Removes a friend from the user's friends list
+     * @param list user's friends list
+     * @param username the username of the friend to be removed
+     */
+    public void removeFriendFromList(ArrayList<ArrayList<String>> list, String username) {
+        for(int i=0; i < list.size(); i ++) {
+            if(list.get(i).contains(username)) {
+                list.remove(i);
+            }
+        }
+    }
 
 }
 
