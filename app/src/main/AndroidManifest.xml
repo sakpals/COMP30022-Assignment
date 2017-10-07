@@ -69,6 +69,17 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppNoTitleBar" >
         </activity>
+
+
+        <activity
+            android:name=".Chat.ChatActivity"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+
+        </activity>
+
       
         <activity android:name=".Friends" />
         <activity android:name=".FriendRequestsActivity" />
@@ -76,6 +87,7 @@
       
       <service android:name=".AR.LocationService"></service>
       
+
     </application>
 
 </manifest>

@@ -21,6 +21,8 @@ import net.noconroy.itproject.application.AR.CompassActivity;
 import net.noconroy.itproject.application.AR.LocationService;
 import net.noconroy.itproject.application.AR.LocationServiceProvider;
 
+import net.noconroy.itproject.application.Chat.ChatActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -147,6 +149,18 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
         startActivity(intent);
     }
+
+
+    public void startChat(View view) {
+        Intent intent = new Intent(this, ChatActivity.class);
+
+        // Change this in order to add the users id and name from server
+        Bundle userClickedOn = new Bundle();
+        userClickedOn.putString("id", "1");         // replace with proper id
+        userClickedOn.putString("name", "bob");     // replace with proper name etc.
+        intent.putExtras(userClickedOn);
+
+        startActivity(intent);
 
 
     public void doBindLocationService() {
@@ -303,5 +317,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+
     }
 }
