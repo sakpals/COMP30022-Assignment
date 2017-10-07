@@ -71,8 +71,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:id="@+id/FriendsList"
+    <Button
         android:id="@+id/FriendsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
