@@ -2,6 +2,9 @@ package net.noconroy.itproject.application;
 
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -26,13 +29,14 @@ public final class ChatHelper {
     private static final String MESSAGE = "/message";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    public static String CreateChannel(String name, String access_token) {
+    public static String CreateChannel(String name, String access_token, Boolean persistent) {
         final OkHttpClient client = new OkHttpClient();
 
         String url = SERVER_ADDRESS + CHANNEL + name;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
+                .add("persistent", persistent.toString())
                 .add("access_token", access_token)
                 .build();
 
@@ -132,18 +136,24 @@ public final class ChatHelper {
         String url = SERVER_ADDRESS + CHANNEL + name + MESSAGE;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
-        //JSONObject json
+        JSONObject jsonMessage = new JSONObject();
+        try {
+            jsonMessage.put("channel", name);
+            jsonMessage.put("message_type", "text/plain");
+            jsonMessage.put("message", message);
 
-        //RequestBody body = RequestBody.create(JSON, json);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
 
+        String msgString = jsonMessage.toString();
 
         RequestBody body = new FormBody.Builder()
-                .add("channel", name)
-                .add("message_type", "text/plain")
-                .add("message", message)
+                .add("data", msgString)
+                .add("type", "text/plain")
                 .add("access_token", access_token)
                 .build();
-
 
         Request request = new Request.Builder()
                 .url(url)
@@ -153,6 +163,7 @@ public final class ChatHelper {
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
+            System.out.println(Integer.toString(response.code()));
             return Integer.toString(response.code());
         } catch (IOException e) {
             e.printStackTrace();
