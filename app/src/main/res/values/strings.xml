@@ -21,8 +21,15 @@
         completions."
     </string>
 
+
     <string name="ok">Ok</string>
     <string name="title_location_permission">Can we have permission to have your location?</string>
     <string name="text_location_permission">Yes</string>
     <string name="location_permission_rationale">Location permission is needed for core functionality</string>
+
+    <string name="register">Register</string>
+    <string name="title_activity_register">Sign in</string>
+    <string name="title_activity_register2">Register2Activity</string>
+    <string name="title_activity_success_splash_screen">SuccessSplashScreenActivity</string>
+
 </resources>

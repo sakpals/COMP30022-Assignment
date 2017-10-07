@@ -15,6 +15,8 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import net.noconroy.itproject.application.AR.CompassActivity;
 import net.noconroy.itproject.application.AR.LocationService;
@@ -38,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     /*****************************  Class Methods  *****************************************/
     /***************************************************************************************/
 
+    private String access_token = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +56,42 @@ public class MainActivity extends AppCompatActivity {
 
         // Set this main activity as the main activity of our app lifecycle handler
         AppLifecycleHandler.setMainActivity(this);
+      
+        // Get the Intent that started this activity and extract the string
+        Intent intent = getIntent();
+        String access_token = intent.getStringExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE);
+        this.access_token = access_token;
+        if (access_token != null){
+
+            // Hide register button
+            Button registerButton = (Button) findViewById(R.id.Registerbutton);
+            registerButton.setVisibility(View.GONE);
+
+
+            // change this to a logout button
+
+            // Change text of Login button
+            Button loginButton = (Button) findViewById(R.id.LoginButton);
+            //loginButton.setText("Logged in");
+            loginButton.setText("Log out");
+
+            // Disable logging in, as you're already logged
+            //loginButton.setEnabled(false);
+
+            loginButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    logout(view);
+                }
+            });
+
+            Button friendsButton = (Button) findViewById(R.id.FriendsButton);
+            friendsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    friends(view);
+                }
+            });
     }
 
     @Override
@@ -79,6 +120,16 @@ public class MainActivity extends AppCompatActivity {
     public void GetCompass(View view) {
         Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
+        }
+    }
+    public void logout(View view) {
+        Intent intent = new Intent(this, LogoutActivity.class);
+        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
+        startActivity(intent);
+    }
+    public void register(View view){
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
     }
 
     public void login(View view){
@@ -91,10 +142,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void addFriend(View view){
-        Intent intent = new Intent(this, AddFriendActivity.class);
+    public void friends(View view) {
+        Intent intent = new Intent(MainActivity.this, Friends.class);
+        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
         startActivity(intent);
     }
+
 
     public void doBindLocationService() {
         if (mLocationService != null) {
