@@ -1,4 +1,4 @@
-package com.example.mattias.devicelocation;
+package net.noconroy.itproject.application;
 
 
 import org.junit.Before;
@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+
+import net.noconroy.itproject.application.AR.CameraFragment;
 
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
