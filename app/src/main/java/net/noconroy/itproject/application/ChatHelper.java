@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -22,8 +23,11 @@ import okhttp3.WebSocketListener;
  */
 
 public final class ChatHelper {
-    private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
-    private static final String CHANNEL = "/channel/";
+    private static final String SERVER_SCHEME = "http";
+    private static final String SERVER_HOST ="10.0.2.2";//"127.0.0.1";
+    private static final Integer SERVER_PORT = 5000;
+   // private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
+    private static final String CHANNEL = "channel/";
     private static final String JOIN = "/join";
     private static final String LEAVE = "/leave";
     private static final String MESSAGE = "/message";
@@ -32,7 +36,13 @@ public final class ChatHelper {
     public static String CreateChannel(String name, String access_token, Boolean persistent) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + CHANNEL + name;
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name)
+                .build();
+        //String url = SERVER_ADDRESS + CHANNEL + name;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
@@ -58,7 +68,13 @@ public final class ChatHelper {
     public static String DeleteChannel(String name, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + CHANNEL + name;
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name)
+                .build();
+        //String url = SERVER_ADDRESS + CHANNEL + name;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
@@ -83,7 +99,13 @@ public final class ChatHelper {
     public static String SubscribeChannel(String name, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + CHANNEL + name + JOIN;
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name+JOIN)
+                .build();
+       // String url = SERVER_ADDRESS + CHANNEL + name + JOIN;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
@@ -108,7 +130,13 @@ public final class ChatHelper {
     public static String LeaveChannel(String name, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + CHANNEL + name + LEAVE;
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name+LEAVE)
+                .build();
+        //String url = SERVER_ADDRESS + CHANNEL + name + LEAVE;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
@@ -133,7 +161,13 @@ public final class ChatHelper {
     public static String MessageChannel(String name, String message, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        String url = SERVER_ADDRESS + CHANNEL + name + MESSAGE;
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name+MESSAGE)
+                .build();
+        //String url = SERVER_ADDRESS + CHANNEL + name + MESSAGE;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         JSONObject jsonMessage = new JSONObject();
@@ -174,8 +208,14 @@ public final class ChatHelper {
     public static void ListenChannels(String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .build();
+
         Request request = new Request.Builder()
-                .url(SERVER_ADDRESS)
+                .url(url)
                 .build();
         WebSocket socket = client.newWebSocket(request, new WebSocketListener() {
             public void onOpen() {
