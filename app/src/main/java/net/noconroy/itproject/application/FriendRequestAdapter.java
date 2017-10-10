@@ -83,7 +83,7 @@ public class FriendRequestAdapter extends BaseAdapter {
                 public void onClick(View view) {
                     NetworkHelper.AcceptFriend(mRequests.requests.get(pos).token, new EmptyCallback(mActivity) {
                         @Override
-                        public void onSuccess(Void object) {
+                        public void onSuccess() {
                             Toast.makeText(mActivity.getApplicationContext(), "ACCEPTED!", Toast.LENGTH_SHORT).show();
                             removeRequest();
                         }

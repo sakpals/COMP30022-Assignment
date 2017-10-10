@@ -147,7 +147,7 @@ public class NetworkHelperUnitTest {
 
         EmptyCallback cb = new EmptyCallback(null) {
             @Override
-            public void onSuccess(Void object) {
+            public void onSuccess() {
 
             }
 
@@ -172,7 +172,7 @@ public class NetworkHelperUnitTest {
 
         final EmptyCallback second = new EmptyCallback(null) {
             @Override
-            public void onSuccess(Void object) {
+            public void onSuccess() {
                 fail("Succeeded logging out twice");
             }
 
@@ -184,7 +184,7 @@ public class NetworkHelperUnitTest {
 
         EmptyCallback first = new EmptyCallback(null) {
             @Override
-            public void onSuccess(Void object) {
+            public void onSuccess() {
                 // Log out second time
                 NetworkHelper.Logout(second);
                 second.waitDone();
@@ -211,7 +211,7 @@ public class NetworkHelperUnitTest {
 
         EmptyCallback cb = new EmptyCallback(null) {
             @Override
-            public void onSuccess(Void object) {
+            public void onSuccess() {
 
             }
 
@@ -264,7 +264,7 @@ public class NetworkHelperUnitTest {
 
         EmptyCallback cb = new EmptyCallback(null) {
             @Override
-            public void onSuccess(Void object) {
+            public void onSuccess() {
 
             }
 

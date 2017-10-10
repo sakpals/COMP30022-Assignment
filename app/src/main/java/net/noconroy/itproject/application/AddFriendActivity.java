@@ -53,7 +53,7 @@ public class AddFriendActivity extends AppCompatActivity {
 
             NetworkHelper.AddFriend(username, new EmptyCallback(this) {
                 @Override
-                public void onSuccess(Void object) {
+                public void onSuccess() {
                     Toast t = Toast.makeText(getApplicationContext(), "Sent friend request!", Toast.LENGTH_SHORT);
                     t.show();
                 }

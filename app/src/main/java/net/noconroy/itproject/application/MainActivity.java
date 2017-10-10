@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         stopLocationService();
         NetworkHelper.Logout(new EmptyCallback(this) {
             @Override
-            public void onSuccess(Void object) {
+            public void onSuccess() {
                 startActivity(intent);
                 finish();
             }

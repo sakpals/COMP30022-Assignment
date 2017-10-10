@@ -284,7 +284,7 @@ public class LocationService extends Service {
                 mCurrentLocation.getLongitude(), new EmptyCallback(null){
 
                     @Override
-                    public void onSuccess(Void object) {
+                    public void onSuccess() {
 
                     }
 

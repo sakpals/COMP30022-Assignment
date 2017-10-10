@@ -14,4 +14,8 @@ public abstract class EmptyCallback extends NetworkCallback<Void> {
     public EmptyCallback(Activity a) {
         super(null, a);
     }
+
+    @Override
+    public void onSuccess(Void _){};
+    public abstract void onSuccess();
 }

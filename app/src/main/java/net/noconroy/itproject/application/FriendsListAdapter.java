@@ -71,7 +71,7 @@ public class FriendsListAdapter extends BaseAdapter {
                 NetworkHelper.RemoveFriend(friend.username, new EmptyCallback(mActivity) {
 
                     @Override
-                    public void onSuccess(Void object) {
+                    public void onSuccess() {
                         Toast.makeText(mActivity.getApplicationContext(), "Removed Friend!", Toast.LENGTH_SHORT).show();
                     }
 
