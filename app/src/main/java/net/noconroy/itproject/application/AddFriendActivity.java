@@ -13,8 +13,6 @@ import net.noconroy.itproject.application.callbacks.EmptyCallback;
 
 public class AddFriendActivity extends AppCompatActivity {
 
-    private String access_token = null;
-
     // UI
     private EditText mSearchUser;
     private Button mFindUserButton;
@@ -29,14 +27,12 @@ public class AddFriendActivity extends AppCompatActivity {
         mSearchUser = (EditText) findViewById(R.id.username_search);
         mFindUserButton = (Button) findViewById(R.id.find_friend_button);
 
-        if (access_token != null) {
-            mFindUserButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    attemptFindUser();
-                }
-            });
-        }
+        mFindUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                attemptFindUser();
+            }
+        });
     }
 
     /**
