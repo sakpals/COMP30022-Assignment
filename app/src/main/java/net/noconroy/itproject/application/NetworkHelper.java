@@ -578,6 +578,10 @@ public final class NetworkHelper {
         listeners.put(type, listener);
     }
 
+    public static void ChannelRemoveListener(String type) {
+        listeners.remove(type);
+    }
+
     /************************************************************************/
     /************************* Helper Methods *******************************/
     /************************************************************************/
