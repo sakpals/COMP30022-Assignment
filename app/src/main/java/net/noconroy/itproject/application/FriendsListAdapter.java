@@ -77,7 +77,7 @@ public class FriendsListAdapter extends BaseAdapter {
 
                     @Override
                     public void onFailure(Failure f) {
-                        mActivity.runOnUiThread(remove_friend_error);
+                        Toast.makeText(mActivity.getApplicationContext(), "Attempt to remove friend failed!", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -85,15 +85,4 @@ public class FriendsListAdapter extends BaseAdapter {
 
         return view;
     }
-
-    /**
-     * Handles the case when there is a network error in attempting to remove a friend.
-     * To be run on the main thread.
-     */
-    private Runnable remove_friend_error = new Runnable() {
-        @Override
-        public void run() {
-            Toast.makeText(mActivity.getApplicationContext(), "Attempt to remove friend failed!", Toast.LENGTH_SHORT).show();
-        }
-    };
 }

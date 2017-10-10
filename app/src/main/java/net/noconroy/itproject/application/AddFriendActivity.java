@@ -61,53 +61,21 @@ public class AddFriendActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Failure f) {
                     if(f.code == 400) {
-                        runOnUiThread(already_sent_request_error);
+                        mSearchUser.setError("Already sent friend request to this user!");
+                        mSearchUser.requestFocus();
                     }
-                    else if(f.code == 404) {
-                        runOnUiThread(user_does_not_exist);
+
+                    if(f.code == 404) {
+                        mSearchUser.setError("This user does not exist!");
+                        mSearchUser.requestFocus();
                     }
-                    else if(f.code == 500) {
-                        runOnUiThread(general_error);
+
+                    if(f.code == 500) {
+                        Toast t = Toast.makeText(getApplicationContext(), "Failed to send friend request!", Toast.LENGTH_SHORT);
+                        t.show();
                     }
                 }
             });
         }
     }
-
-    /* Handles server errors. To be run in the main thread. */
-
-    /**
-     * Handles the case when a friend request has already been sent, in case a user tries
-     * to add the same person twice.
-     */
-    private Runnable already_sent_request_error = new Runnable() {
-        @Override
-        public void run() {
-            mSearchUser.setError("Already sent friend request to this user!");
-            mSearchUser.requestFocus();
-        }
-    };
-
-    /**
-     * Handles the case when a user attempts to search for a username that does not exist.
-     */
-    private Runnable user_does_not_exist = new Runnable() {
-        @Override
-        public void run() {
-            mSearchUser.setError("This user does not exist!");
-            mSearchUser.requestFocus();
-        }
-    };
-
-    /**
-     * Handles the case when the server fails to send a friend request.
-     */
-    private Runnable general_error = new Runnable() {
-        @Override
-        public void run() {
-            Toast t = Toast.makeText(getApplicationContext(), "Failed to send friend request!", Toast.LENGTH_SHORT);
-            t.show();
-        }
-    };
-
 }

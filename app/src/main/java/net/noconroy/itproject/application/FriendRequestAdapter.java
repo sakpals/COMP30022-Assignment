@@ -91,16 +91,15 @@ public class FriendRequestAdapter extends BaseAdapter {
                         @Override
                         public void onFailure(Failure f) {
                             if(f.code == 404) {
-                                mActivity.runOnUiThread(already_accepted_request_error);
+                                Toast.makeText(mActivity.getApplicationContext(), "Already accepted this friend!", Toast.LENGTH_SHORT).show();
                             }
 
                             if(f.code == 400) {
-                                mActivity.runOnUiThread(already_friends_error);
-                                removeRequest();
+                                Toast.makeText(mActivity.getApplicationContext(), "Already friends with this user!", Toast.LENGTH_SHORT).show();
                             }
 
                             if(f.code == 500) {
-                                mActivity.runOnUiThread(accept_request_error);
+                                Toast.makeText(mActivity.getApplicationContext(), "Error in accepting friend request!", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -112,42 +111,5 @@ public class FriendRequestAdapter extends BaseAdapter {
         private void removeRequest() {
             mActivity.updateRequests();
         }
-
-        /**
-         * Handles the case when a user has already accepted a friend.
-         * NOTE: This is never really called as the list view is modified as soon
-         * as a user accepts a friend so that they cannot accept twice. Just a precaution.
-         */
-        private Runnable already_accepted_request_error = new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(mActivity.getApplicationContext(), "Already accepted this friend!", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        /**
-         * Handles the case when there may be some network error disabling a user
-         * from accepting a friend request correctly.
-         */
-        private Runnable accept_request_error = new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(mActivity.getApplicationContext(), "Error in accepting friend request!", Toast.LENGTH_SHORT).show();
-
-            }
-        };
-
-        /**
-         * Handles the case when a user is trying to accept a friend request from
-         * someone who is already their friend.
-         * NOTE: Again, this shouldn't get called, but included in an effort to handle all server
-         * error messages.
-         */
-        private Runnable already_friends_error = new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(mActivity.getApplicationContext(), "Already friends with this user!", Toast.LENGTH_SHORT).show();
-            }
-        };
 
 }
