@@ -71,12 +71,12 @@ public class ChatHelperUnitTest {
     }
 
     @Test
-    public void GetMessagesTest() {
+    public void GetAllMessagesTest() {
         String channel_name = UUID.randomUUID().toString();
         ChatHelper.CreateChannel(channel_name, access_token);
         ChatHelper.SubscribeChannel(channel_name, access_token2);
         ChatHelper.MessageChannel(channel_name, username2, "test_message", access_token2);
-        String msg = ChatHelper.GetMessages(channel_name, "0", "0", access_token);
+        String msg = ChatHelper.GetAllMessages(channel_name, access_token);
         if (msg.isEmpty())
             throw new AssertionError();
         System.out.println(msg);

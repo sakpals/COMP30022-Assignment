@@ -225,6 +225,29 @@ public final class ChatHelper {
         }
     }
 
+    public static String GetAllMessages(String channel, String access_token) {
+        final OkHttpClient client = new OkHttpClient();
+
+        access_token = access_token.replaceAll("^\"|\"$","");
+
+        HttpUrl url = constructURL(CHANNEL + channel + MESSAGE, access_token);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            String res = response.body().string();
+
+            return res;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 /*
     public static void ListenChannels(String access_token) {
@@ -280,8 +303,8 @@ public final class ChatHelper {
                 .host(SERVER_HOST)
                 .port(SERVER_PORT)
                 .addPathSegments(segment)
-                //.addQueryParameter("from", from)
-                //.addQueryParameter("to", to)
+                .addQueryParameter("from", from)
+                .addQueryParameter("to", to)
                 .addQueryParameter(ACCESS_TOKEN_NAME, token)
                 .build();
         return url;
