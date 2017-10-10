@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,9 @@ import net.noconroy.itproject.application.AR.LocationService;
 import net.noconroy.itproject.application.AR.LocationServiceProvider;
 
 import net.noconroy.itproject.application.Chat.ChatActivity;
+
+import static net.noconroy.itproject.application.HomeActivity.AT_PREFS;
+import static net.noconroy.itproject.application.HomeActivity.AT_PREFS_KEY;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,8 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
-        String access_token = intent.getStringExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE);
-        this.access_token = access_token;
+        access_token = intent.getStringExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE);
 
         // Set all location parameters
         mLocationServiceIntent = null;
@@ -65,38 +68,6 @@ public class MainActivity extends AppCompatActivity {
         // Set this main activity as the main activity of our app lifecycle handler
         AppLifecycleHandler.setMainActivity(this);
 
-        if (access_token != null) {
-
-            // Hide register button
-            Button registerButton = (Button) findViewById(R.id.Registerbutton);
-            registerButton.setVisibility(View.GONE);
-
-
-            // change this to a logout button
-
-            // Change text of Login button
-            Button loginButton = (Button) findViewById(R.id.LoginButton);
-            //loginButton.setText("Logged in");
-            loginButton.setText("Log out");
-
-            // Disable logging in, as you're already logged
-            //loginButton.setEnabled(false);
-
-            loginButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    logout(view);
-                }
-            });
-
-            Button friendsButton = (Button) findViewById(R.id.FriendsButton);
-            friendsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    friends(view);
-                }
-            });
-        }
     }
 
     @Override
@@ -128,18 +99,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logout(View view) {
-        Intent intent = new Intent(this, LogoutActivity.class);
-        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
+        Intent intent = new Intent(this, HomeActivity.class);
+        SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
+        settings.edit().remove(AT_PREFS_KEY).commit();
         startActivity(intent);
-    }
-    public void register(View view){
-        Intent intent = new Intent(this, RegisterActivity.class);
-        startActivity(intent);
-    }
-
-    public void login(View view){
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+        finish();
     }
 
     public void camera(View view){
