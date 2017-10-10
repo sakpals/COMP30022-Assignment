@@ -24,7 +24,7 @@ import okhttp3.WebSocketListener;
 
 public final class ChatHelper {
     private static final String SERVER_SCHEME = "http";
-    private static final String SERVER_HOST ="10.0.2.2";//"127.0.0.1";
+    private static final String SERVER_HOST = "127.0.0.1";
     private static final Integer SERVER_PORT = 5000;
    // private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
     private static final String CHANNEL = "channel/";
