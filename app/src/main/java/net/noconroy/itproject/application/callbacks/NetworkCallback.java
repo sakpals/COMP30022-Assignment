@@ -1,17 +1,10 @@
 package net.noconroy.itproject.application.callbacks;
 
 import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -84,7 +77,7 @@ public abstract class NetworkCallback<T> implements Callback {
         public void run() {
             Failure f = new Failure();
             f.code = -1;
-            f.msg = "Network error";
+            f.message = "Network error";
             onFailure(f);
             done();
         }
@@ -92,10 +85,10 @@ public abstract class NetworkCallback<T> implements Callback {
 
     public class Failure {
         public int code;
-        public String msg;
+        public String message;
 
         public String toString() {
-            return "ERR: " + code + ", MSG: " + msg;
+            return "ERR: " + code + ", MSG: " + message;
         }
     }
 
