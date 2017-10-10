@@ -66,7 +66,7 @@ public class NetworkHelperUnitTest {
 
         u.username = username == null ? UUID.randomUUID().toString() : username;
 
-        AuthenticationCallback cb = new AuthenticationCallback() {
+        AuthenticationCallback cb = new AuthenticationCallback(null) {
             @Override
             public void onAuthenticated(String access_token) {
                 u.access_token = access_token;
@@ -112,7 +112,7 @@ public class NetworkHelperUnitTest {
 
         NewUser nu = newUser(null);
 
-        AuthenticationCallback cb = new AuthenticationCallback() {
+        AuthenticationCallback cb = new AuthenticationCallback(null) {
             @Override
             public void onAuthenticated(String access_token) {
                 // Checks for whitespaces in ACCESS_TOKEN, which usually occers if the
@@ -145,7 +145,7 @@ public class NetworkHelperUnitTest {
 
         NewUser nu = newUser(null);
 
-        EmptyCallback cb = new EmptyCallback() {
+        EmptyCallback cb = new EmptyCallback(null) {
             @Override
             public void onSuccess(Void object) {
 
@@ -170,7 +170,7 @@ public class NetworkHelperUnitTest {
 
         final NewUser nu = newUser(null);
 
-        final EmptyCallback second = new EmptyCallback() {
+        final EmptyCallback second = new EmptyCallback(null) {
             @Override
             public void onSuccess(Void object) {
                 fail("Succeeded logging out twice");
@@ -182,7 +182,7 @@ public class NetworkHelperUnitTest {
             }
         };
 
-        EmptyCallback first = new EmptyCallback() {
+        EmptyCallback first = new EmptyCallback(null) {
             @Override
             public void onSuccess(Void object) {
                 // Log out second time
@@ -209,7 +209,7 @@ public class NetworkHelperUnitTest {
 
         NewUser nu = newUser(null);
 
-        EmptyCallback cb = new EmptyCallback() {
+        EmptyCallback cb = new EmptyCallback(null) {
             @Override
             public void onSuccess(Void object) {
 
@@ -236,7 +236,7 @@ public class NetworkHelperUnitTest {
 
         NewUser nu = newUser(null);
 
-        NetworkCallback<Profile> cb = new NetworkCallback<Profile>(Profile.class){
+        NetworkCallback<Profile> cb = new NetworkCallback<Profile>(Profile.class, null){
 
             @Override
             public void onSuccess(Profile p) {
