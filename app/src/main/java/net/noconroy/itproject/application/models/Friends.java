@@ -7,5 +7,8 @@ import java.util.List;
  */
 
 public class Friends {
-    public List<Profile> friends;
+    public class Friend {
+        public Profile profile;
+    }
+    public List<Friend> friends;
 }

@@ -52,7 +52,7 @@ public class FriendsListAdapter extends BaseAdapter {
     /* Sets up the view for a particular row within the friends list. */
     @Override
     public View getView(final int pos, View convertView, ViewGroup parent) {
-        final Profile friend = mFriends.friends.get(pos);
+        final Profile friend = mFriends.friends.get(pos).profile;
         View view = convertView;
         if(view == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
