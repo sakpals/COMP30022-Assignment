@@ -102,6 +102,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, HomeActivity.class);
         SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
         settings.edit().remove(AT_PREFS_KEY).commit();
+
+        stopLocationService();
+        NetworkHelper.Logout(access_token);
+
         startActivity(intent);
         finish();
     }
