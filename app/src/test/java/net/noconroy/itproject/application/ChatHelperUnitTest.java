@@ -1,5 +1,8 @@
 package net.noconroy.itproject.application;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -70,10 +73,22 @@ public class ChatHelperUnitTest {
         String channel_name = UUID.randomUUID().toString();
         ChatHelper.CreateChannel(channel_name, access_token, true);
         ChatHelper.SubscribeChannel(channel_name, access_token2);
-        String response = ChatHelper.MessageChannel(channel_name, test_message, access_token2);
-        assertEquals(response, "200");
+        if (!ChatHelper.MessageChannel(channel_name, username2, "test_message", access_token2).equals("200"))
+            throw new AssertionError();
     }
 
+    @Test
+    public void GetAllMessagesTest() {
+        String channel_name = UUID.randomUUID().toString();
+        ChatHelper.CreateChannel(channel_name, access_token, true);
+        ChatHelper.SubscribeChannel(channel_name, access_token2);
+        ChatHelper.MessageChannel(channel_name, username2, "test_message", access_token2);
+        String msg = ChatHelper.GetAllMessages(channel_name, access_token);
+        if (msg.isEmpty())
+            throw new AssertionError();
+        System.out.println(msg);
+    }
+/*
     @Test
     public void ListenChannelsTest() {
         String channel_name = UUID.randomUUID().toString();
@@ -81,4 +96,6 @@ public class ChatHelperUnitTest {
         ChatHelper.SubscribeChannel(channel_name, access_token2);
         ChatHelper.ListenChannels(access_token2);
     }
+*/
 }
+
