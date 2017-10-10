@@ -1,6 +1,5 @@
 package net.noconroy.itproject.application;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
@@ -8,12 +7,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import net.noconroy.itproject.application.callbacks.EmptyCallback;
-import net.noconroy.itproject.application.callbacks.NetworkCallback;
-
 
 public class AddFriendActivity extends AppCompatActivity {
 
@@ -59,7 +55,7 @@ public class AddFriendActivity extends AppCompatActivity {
             Toast t = Toast.makeText(getApplicationContext(), "Attempting to add friend: "+username, Toast.LENGTH_SHORT);
             t.show();
 
-            NetworkHelper.AddFriend(username, new EmptyCallback() {
+            NetworkHelper.AddFriend(username, new EmptyCallback(this) {
                 @Override
                 public void onSuccess(Void object) {
                     Toast t = Toast.makeText(getApplicationContext(), "Sent friend request!", Toast.LENGTH_SHORT);

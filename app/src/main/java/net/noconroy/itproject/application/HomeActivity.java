@@ -97,7 +97,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void attemptAuthentication(final String username, final String password) {
 
-        final AuthenticationCallback registerCallback = new AuthenticationCallback() {
+        final AuthenticationCallback registerCallback = new AuthenticationCallback(this) {
             @Override
             public void onAuthenticated(String access_token) {
                 SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
@@ -111,7 +111,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         };
 
-        AuthenticationCallback loginCallback = new AuthenticationCallback() {
+        AuthenticationCallback loginCallback = new AuthenticationCallback(this) {
             @Override
             public void onAuthenticated(String access_token) {
                 SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);

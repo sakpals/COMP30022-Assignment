@@ -75,10 +75,11 @@ public class FriendsActivity extends AppCompatActivity {
 
     /* Displays user's friend list within this current activity. */
     public void displayFriendsList() {
-        NetworkHelper.GetFriends(new NetworkCallback<Friends>(Friends.class) {
+        NetworkHelper.GetFriends(new NetworkCallback<Friends>(Friends.class, this) {
             @Override
             public void onSuccess(Friends friends) {
-                mFriendsList.setAdapter(new FriendsListAdapter(friends, getApplicationContext(), FriendsActivity.this));
+                mFriendsListAdapter = new FriendsListAdapter(friends, getApplicationContext(), FriendsActivity.this);
+                mFriendsList.setAdapter(mFriendsListAdapter);
             }
 
             @Override
@@ -87,6 +88,7 @@ public class FriendsActivity extends AppCompatActivity {
             }
         });
     }
+
 
 
     public void updateFriendsList() {

@@ -281,7 +281,7 @@ public class LocationService extends Service {
 
         NetworkHelper.UpdateLocation(ds.me.username,
                 mCurrentLocation.getLatitude(),
-                mCurrentLocation.getLongitude(), new EmptyCallback(){
+                mCurrentLocation.getLongitude(), new EmptyCallback(null){
 
                     @Override
                     public void onSuccess(Void object) {

@@ -46,7 +46,7 @@ public class FriendRequestsActivity extends AppCompatActivity {
      * Calls an asynchronous task to display a user's friend list
      */
     public void showFriendRequests() {
-        NetworkHelper.GetIncomingFriendRequests(new NetworkCallback<IncomingFriendRequests>(IncomingFriendRequests.class) {
+        NetworkHelper.GetIncomingFriendRequests(new NetworkCallback<IncomingFriendRequests>(IncomingFriendRequests.class, this) {
             @Override
             public void onSuccess(IncomingFriendRequests incoming) {
                 customAdapter = new FriendRequestAdapter(incoming, getApplicationContext(), FriendRequestsActivity.this);

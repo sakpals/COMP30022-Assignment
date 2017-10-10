@@ -48,7 +48,7 @@ public class DataStorage {
         if(access_token == null)
             return;
 
-        NetworkHelper.GetProfile(null, new NetworkCallback<Profile>(Profile.class) {
+        NetworkHelper.GetProfile(null, new NetworkCallback<Profile>(Profile.class, null) {
             @Override
             public void onSuccess(Profile profile) {
                 me = profile;

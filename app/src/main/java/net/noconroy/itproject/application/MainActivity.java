@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         settings.edit().remove(AT_PREFS_KEY).commit();
 
         stopLocationService();
-        NetworkHelper.Logout(new EmptyCallback() {
+        NetworkHelper.Logout(new EmptyCallback(this) {
             @Override
             public void onSuccess(Void object) {
                 startActivity(intent);

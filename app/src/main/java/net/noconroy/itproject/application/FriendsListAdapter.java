@@ -68,7 +68,7 @@ public class FriendsListAdapter extends BaseAdapter {
         mRemoveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NetworkHelper.RemoveFriend(friend.username, new EmptyCallback() {
+                NetworkHelper.RemoveFriend(friend.username, new EmptyCallback(mActivity) {
 
                     @Override
                     public void onSuccess(Void object) {

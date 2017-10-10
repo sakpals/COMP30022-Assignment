@@ -1,5 +1,7 @@
 package net.noconroy.itproject.application.callbacks;
 
+import android.app.Activity;
+
 import com.google.gson.JsonObject;
 
 import net.noconroy.itproject.application.DataStorage;
@@ -16,8 +18,8 @@ public abstract class AuthenticationCallback extends NetworkCallback<Authenticat
         public String access_token;
     }
 
-    public AuthenticationCallback() {
-        super(AccessToken.class);
+    public AuthenticationCallback(Activity a) {
+        super(AccessToken.class, a);
     }
 
     @Override

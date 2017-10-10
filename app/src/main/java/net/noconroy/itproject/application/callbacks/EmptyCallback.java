@@ -1,5 +1,6 @@
 package net.noconroy.itproject.application.callbacks;
 
+import android.app.Activity;
 import android.support.annotation.Nullable;
 
 /**
@@ -7,7 +8,7 @@ import android.support.annotation.Nullable;
  */
 
 public abstract class EmptyCallback extends NetworkCallback<Void> {
-    public EmptyCallback() {
-        super(null);
+    public EmptyCallback(Activity a) {
+        super(null, a);
     }
 }
