@@ -8,6 +8,10 @@ package net.noconroy.itproject.application;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
+import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,12 +61,27 @@ public final class NetworkHelper {
     private static final String FRIEND_REQUESTS_OUT = "friends/requests/out";
     private static final String LOCATION = "location/";
     private static final String LOCATION_SHARE = "/share";
-
+    private static final OkHttpClient client = new OkHttpClient();
 
     /************************************************************************/
     /********************* User Profile Methods *****************************/
     /************************************************************************/
 
+    public static String Register(String username, String password,
+                                  String avatar_url, String description) {
+        Register(username, password, avatar_url, description, null);
+        return "";
+    }
+
+    public static String Login(String username, String password) {
+        Login(username, password, null);
+        return "";
+    }
+
+    public static String Logout(String access_token) {
+        Logout(access_token, null);
+        return "";
+    }
 
     /**
      * Registers a user in the database, for now the user MUST enter all
@@ -76,9 +95,8 @@ public final class NetworkHelper {
      * @param description The user chooses a description
      * @return The http message the server sends in response to this request
      */
-    public static String Register(String username, String password,
-                                  String avatar_url, String description) {
-        final OkHttpClient client = new OkHttpClient();
+    public static void Register(String username, String password,
+                                  String avatar_url, String description, AuthenticationCallback cb) {
 
         RequestBody body =  createBodyRequest(new String []
                         {"password", password},
@@ -101,22 +119,7 @@ public final class NetworkHelper {
 
 
         Call call = client.newCall(request);
-        try {
-
-            Response response = call.execute();
-            String res = response.body().string();
-
-            if (!response.isSuccessful()) {
-                return null;
-            }
-
-            JsonObject token = new JsonParser().parse(res).getAsJsonObject();
-            return token.get(ACCESS_TOKEN_NAME).toString();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
+        call.enqueue(cb);
     }
 
 
@@ -129,9 +132,7 @@ public final class NetworkHelper {
      * @return The access token assoicated with the user, or if the request
      * http message was invalid, return the servers http message response code
      */
-    public static String Login(String username, String password) {
-        final OkHttpClient client = new OkHttpClient();
-
+    public static void Login(String username, String password, AuthenticationCallback cb) {
         RequestBody body =  createBodyRequest(new String []
                         {"username", username},
                 new String [] {"password", password});
@@ -150,20 +151,7 @@ public final class NetworkHelper {
                 .build();
 
         Call call = client.newCall(request);
-        try {
-            Response response = call.execute();
-            String res = response.body().string();
-
-            if (!response.isSuccessful()) {
-                return null;
-            }
-
-            JsonObject token = new JsonParser().parse(res).getAsJsonObject();
-            return token.get(ACCESS_TOKEN_NAME).toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
+        call.enqueue(cb);
     }
 
 
@@ -173,9 +161,7 @@ public final class NetworkHelper {
      * @param access_token The users access token they received at login
      * @return The http message the server sends in response to this request
      */
-    public static String Logout(String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
+    public static void Logout(String access_token, EmptyCallback cb) {
         // Create an empty body
         RequestBody body = RequestBody.create(null, new byte[0]);
 
@@ -190,13 +176,7 @@ public final class NetworkHelper {
                 .build();
 
         Call call = client.newCall(request);
-        try {
-            Response response = call.execute();
-            return Integer.toString(response.code());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
+        call.enqueue(cb);
     }
 
 
@@ -214,8 +194,6 @@ public final class NetworkHelper {
     public static String UpdateProfile(String username, String password,
                                        String avatar_url, String description,
                                        String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         RequestBody body =  createBodyRequest(new String []
                 {"description", description});
 
@@ -251,7 +229,6 @@ public final class NetworkHelper {
      * username paramater
      */
     public static String GetProfile(String username, String access_token) {
-        final OkHttpClient client = new OkHttpClient();
 
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
@@ -303,8 +280,6 @@ public final class NetworkHelper {
      */
     public static String UpdateLocation(String username, String lat, String lon,
                                         String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         RequestBody body =  createBodyRequest(new String [] {"lat", lat},
                 new String [] {"lon", lon});
 
@@ -337,8 +312,6 @@ public final class NetworkHelper {
      * @return
      */
     public static String UpdateLocationSettings(String username, String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         // Create an empty body
         RequestBody body = RequestBody.create(null, new byte[0]);
 
@@ -375,8 +348,6 @@ public final class NetworkHelper {
      */
     public static String[] RetrieveLocation(String username,
                                             String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
@@ -427,8 +398,6 @@ public final class NetworkHelper {
      * @return The http message the server sends in response to this request
      */
     public static String AddFriend(String username, String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         // Create an empty body
         RequestBody body = RequestBody.create(null, new byte[0]);
 
@@ -463,8 +432,6 @@ public final class NetworkHelper {
      */
     public static String AcceptFriend(String friendship_token,
                                       String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         // Create an empty body
         RequestBody body = RequestBody.create(null, new byte[0]);
 
@@ -500,8 +467,6 @@ public final class NetworkHelper {
      * currently only username and description
      */
     public static ArrayList<ArrayList<String>> GetFriends(String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
@@ -544,8 +509,6 @@ public final class NetworkHelper {
      * @return The http message the server sends in response to this request
      */
     public static String RemoveFriend(String username, String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         // Create an empty body
         RequestBody body = RequestBody.create(null, new byte[0]);
 
@@ -582,8 +545,6 @@ public final class NetworkHelper {
      * friendship request token
      */
     public static HashMap<String, String> GetIncomingFriendRequests(String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 
@@ -647,8 +608,6 @@ public final class NetworkHelper {
      * only usernamesso far)
      */
     public static ArrayList<ArrayList<String>> GetOutgoingFriendRequests(String access_token) {
-        final OkHttpClient client = new OkHttpClient();
-
         // Remove quotation marks so it is in the correct format for okhttp3
         access_token = removeQuotations(access_token);
 

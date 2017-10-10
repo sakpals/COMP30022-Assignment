@@ -10,6 +10,10 @@ package net.noconroy.itproject.application;
  * accecting the tested method.
  */
 
+import android.util.Log;
+
+import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -50,20 +54,25 @@ public class NetworkHelperUnitTest {
     private final String server_offline_error = "The server ist most" +
             "likey offline, please try again later";
 
-
-
     // Basic Register test to test if server accepts registering
     @Test
     public void RegisterTest() throws Exception {
 
         // Register user
         String username = UUID.randomUUID().toString();
-        String response = NetworkHelper.Register(username, test_password,
-                test_avatar_url, test_description);
+        NetworkHelper.Register(username, test_password,
+                test_avatar_url, test_description, new AuthenticationCallback() {
+                    @Override
+                    public void onAuthenticated(String access_token) {
 
-        // Test if the server accepts this registering
-        if (response == null)
-            throw new AssertionError(response);
+                    }
+
+                    @Override
+                    public void onFailure(Failure f) {
+                        throw new AssertionError(f.msg);
+                    }
+                });
+        Thread.sleep(10000);
     }
 
 
