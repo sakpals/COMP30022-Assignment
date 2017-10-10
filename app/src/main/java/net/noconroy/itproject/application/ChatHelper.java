@@ -1,6 +1,12 @@
 package net.noconroy.itproject.application;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,14 +30,13 @@ import okhttp3.WebSocketListener;
 
 public final class ChatHelper {
     private static final String SERVER_SCHEME = "http";
-    private static final String SERVER_HOST = "127.0.0.1";
+    private static final String SERVER_HOST ="127.0.0.1";
     private static final Integer SERVER_PORT = 5000;
-   // private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
+    private static final String ACCESS_TOKEN_NAME = "access_token";
     private static final String CHANNEL = "channel/";
     private static final String JOIN = "/join";
     private static final String LEAVE = "/leave";
     private static final String MESSAGE = "/message";
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     public static String CreateChannel(String name, String access_token, Boolean persistent) {
         final OkHttpClient client = new OkHttpClient();
@@ -137,6 +142,7 @@ public final class ChatHelper {
                 .addPathSegments(CHANNEL+name+LEAVE)
                 .build();
         //String url = SERVER_ADDRESS + CHANNEL + name + LEAVE;
+
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
@@ -158,7 +164,9 @@ public final class ChatHelper {
         }
     }
 
-    public static String MessageChannel(String name, String message, String access_token) {
+    public static String MessageChannel(String name, String user, String message, String access_token) {
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        String type = "text/plain; charset=utf-8";
         final OkHttpClient client = new OkHttpClient();
 
         HttpUrl url = new HttpUrl.Builder()
@@ -197,7 +205,6 @@ public final class ChatHelper {
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
-            System.out.println(Integer.toString(response.code()));
             return Integer.toString(response.code());
         } catch (IOException e) {
             e.printStackTrace();
@@ -205,34 +212,84 @@ public final class ChatHelper {
         }
     }
 
-    public static void ListenChannels(String access_token) {
+    public static String GetMessages(String channel, String from, String to, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        HttpUrl url = new HttpUrl.Builder()
-                .scheme(SERVER_SCHEME)
-                .host(SERVER_HOST)
-                .port(SERVER_PORT)
-                .build();
+        access_token = access_token.replaceAll("^\"|\"$","");
+
+        HttpUrl url = constructURL(CHANNEL + channel + MESSAGE,
+                from, to, access_token);
 
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        WebSocket socket = client.newWebSocket(request, new WebSocketListener() {
-            public void onOpen() {
-                System.out.println("open");
-            }
-            public void onMessage() {
-                System.out.println("message");
-            }
-            public void onFailure() {
-                System.out.println("fail");
-            }
-            public void onClosing() {
-                System.out.println("closing");
-            }
-            public void onClosed() {
-                System.out.println("closed");
-            }
-        });
+
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            String res = response.body().string();
+
+            return res;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String GetAllMessages(String channel, String access_token) {
+        final OkHttpClient client = new OkHttpClient();
+
+        access_token = access_token.replaceAll("^\"|\"$","");
+
+        HttpUrl url = constructURL(CHANNEL + channel + MESSAGE, access_token);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            String res = response.body().string();
+
+            return res;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static HttpUrl constructURL(String segment){
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(segment)
+                .build();
+        return url;
+    }
+
+    private static HttpUrl constructURL(String segment, String token){
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(segment)
+                .addQueryParameter(ACCESS_TOKEN_NAME, token)
+                .build();
+        return url;
+    }
+
+    private static HttpUrl constructURL(String segment, String from, String to, String token){
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(segment)
+                .addQueryParameter("from", from)
+                .addQueryParameter("to", to)
+                .addQueryParameter(ACCESS_TOKEN_NAME, token)
+                .build();
+        return url;
     }
 }
