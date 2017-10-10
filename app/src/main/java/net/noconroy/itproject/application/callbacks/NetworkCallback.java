@@ -3,6 +3,7 @@ package net.noconroy.itproject.application.callbacks;
 import android.app.Activity;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
@@ -53,7 +54,7 @@ public abstract class NetworkCallback<T> implements Callback {
                 e.printStackTrace();
             }
 
-            if(response.isSuccessful()) {
+            if(response.code() >= 200 && response.code() < 400) {
                 Gson gson = new Gson();
                 if(type != null) {
                     T obj = gson.fromJson(body, type);
@@ -88,7 +89,9 @@ public abstract class NetworkCallback<T> implements Callback {
         public void run() {
             Failure f = new Failure();
             f.code = -1;
-            f.message = "Network error";
+            JsonObject m = new JsonObject();
+            m.addProperty("error", "Network failure");
+            f.message = m;
             onFailure(f);
             done();
         }
@@ -96,7 +99,7 @@ public abstract class NetworkCallback<T> implements Callback {
 
     public class Failure {
         public int code;
-        public String message;
+        public JsonObject message;
 
         public String toString() {
             return "ERR: " + code + ", MSG: " + message;

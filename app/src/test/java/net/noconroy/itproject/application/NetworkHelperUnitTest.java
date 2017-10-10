@@ -12,15 +12,19 @@ package net.noconroy.itproject.application;
 
 import android.util.Log;
 
+import com.google.gson.JsonObject;
+
 import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
 import net.noconroy.itproject.application.callbacks.EmptyCallback;
 import net.noconroy.itproject.application.callbacks.NetworkCallback;
+import net.noconroy.itproject.application.models.Message;
 import net.noconroy.itproject.application.models.Profile;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.Call;
@@ -318,6 +322,60 @@ public class NetworkHelperUnitTest {
                 // description
                 assertEquals(profile.description, test_description);
                 assertEquals(profile.username, nu1.username);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
+
+        // User 2 tried to get the profile description of user 1
+        NetworkHelper.GetProfile(nu1.username, cb);
+    }
+
+
+    // Tests that a user cannot update another users profile
+    @Test
+    public void UpdateAnotherUsersProfileTest() throws Exception {
+
+        // Register and login user 1
+        final NewUser nu1 = newUser(null);
+
+        // Register user 2
+        final NewUser nu2 = newUser(null);
+
+
+        EmptyCallback cb = new EmptyCallback(null) {
+
+            @Override
+            public void onSuccess() {
+                fail("User updated anothers profile!");
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        };
+
+        // User 2 tried to get the profile description of user 1
+        NetworkHelper.UpdateProfile(nu1.username, wrong_password, test_avatar_url, test_description3, cb);
+    }
+
+    // Tests channel creation deletion
+    @Test
+    public void ChannelThorough() throws Exception {
+
+        String channel = UUID.randomUUID().toString();
+        final NewUser nu = newUser(null);
+
+        Thread.sleep(5000);
+
+        // Create channel
+        EmptyCallback createCallback = new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
 
             }
 
@@ -327,36 +385,60 @@ public class NetworkHelperUnitTest {
             }
         };
 
-        // User 1 tried to get the profile description of user 2
-        NetworkHelper.GetProfile(nu1.username, cb);
+        NetworkHelper.ChannelCreate(channel, true, createCallback);
+        createCallback.waitDone();
+
+        // Start channel listeners
+        NetworkHelper.ChannelListen();
+
+        NetworkHelper.ChannelAddListener("m.test", new NetworkHelper.Receiver() {
+            @Override
+            public void process(Message message) {
+                System.out.println("Received message: " + message);
+            }
+        });
+
+        // Send messages
+        EmptyCallback messageCallback = new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
+
+        JsonObject msg = new JsonObject();
+        msg.addProperty("text", "My sample text");
+
+        int i = 0;
+        while(i < 10) {
+            NetworkHelper.ChannelMessage(channel, "m.test", msg, messageCallback);
+            Thread.sleep(1000);
+            i++;
+        }
+
+        // Get all messages for channel
+        NetworkCallback<NetworkHelper.Messages> getCallback = new NetworkCallback<NetworkHelper.Messages>(NetworkHelper.Messages.class, null) {
+            @Override
+            public void onSuccess(NetworkHelper.Messages o) {
+                assertEquals(o.messages.size(), 10);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
+
+        NetworkHelper.ChannelMessages(channel, getCallback);
+        getCallback.waitDone();
     }
 
 /*
-    // Tests that a user cannot update another users profile
-    @Test
-    public void UpdateAnotherUsersProfileTest() throws Exception {
-
-        // Register and login user 1
-        String username1 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username1, test_password, test_avatar_url,
-                test_description1);
-        String access_token1 = NetworkHelper.Login(username1, test_password);
-
-        // Register and login user 2
-        String username2 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username2, test_password, test_avatar_url,
-                test_description2);
-        String access_token2 = NetworkHelper.Login(username2, test_password);
-
-        // User 2 tries to update user 1's profile
-        String response = NetworkHelper.UpdateProfile(username1,
-                wrong_password, test_avatar_url, test_description2, access_token2);
-
-        // Throw error if the server accepts this
-        if (isAccepted(response)) fail(response);
-    }
-
-
     // Tests that the server accepts request to update users own location
     @Test
     public void UpdateLocationTest() throws Exception {

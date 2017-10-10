@@ -5,11 +5,15 @@ package net.noconroy.itproject.application;
  * interact with the client
  */
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
 import net.noconroy.itproject.application.callbacks.EmptyCallback;
 import net.noconroy.itproject.application.callbacks.NetworkCallback;
 import net.noconroy.itproject.application.models.Friends;
 import net.noconroy.itproject.application.models.IncomingFriendRequests;
+import net.noconroy.itproject.application.models.Message;
 import net.noconroy.itproject.application.models.Orientation;
 import net.noconroy.itproject.application.models.OutgoingFriendRequests;
 import net.noconroy.itproject.application.models.Profile;
@@ -17,14 +21,22 @@ import net.noconroy.itproject.application.models.Profile;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
+import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okio.ByteString;
 
 /**
  * Created by James on 7/09/2017.
@@ -59,7 +71,13 @@ public final class NetworkHelper {
     private static final String FRIEND_REQUESTS_IN = "friends/requests/in";
     private static final String FRIEND_REQUESTS_OUT = "friends/requests/out";
     private static final String LOCATION = "location/";
-    private static final String LOCATION_SHARE = "/share";
+
+    private static final String CHANNEL = "channel/";
+    private static final String JOIN = "/join";
+    private static final String LEAVE = "/leave";
+    private static final String MESSAGE = "/message";
+    private static final String LISTEN_CHANNELS = "sync";
+
     private static final OkHttpClient client = new OkHttpClient();
 
     /************************************************************************/
@@ -405,7 +423,160 @@ public final class NetworkHelper {
         call.enqueue(cb);
     }
 
+    /************************************************************************/
+    /********************* Channel Methods ****************************/
+    /************************************************************************/
 
+
+    public static void ChannelCreate(String name, Boolean persistent, EmptyCallback cb) {
+
+        HttpUrl url = constructURL(CHANNEL + name);
+
+        RequestBody body = new FormBody.Builder()
+                .add("persistent", persistent.toString())
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .put(body)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(cb);
+    }
+
+    public static void ChannelDelete(String name, EmptyCallback cb) {
+
+        HttpUrl url = constructURL(CHANNEL + name);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .delete(null)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(cb);
+    }
+
+    public static void ChannelSubscribe(String name, EmptyCallback cb) {
+        HttpUrl url = constructURL(CHANNEL + name + JOIN);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(null)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(cb);
+    }
+
+    public static void ChannelLeave(String name, EmptyCallback cb) {
+
+        HttpUrl url = constructURL(CHANNEL + name + LEAVE);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(null)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(cb);
+    }
+
+    public class Messages { List<Message> messages; };
+
+    public static void ChannelMessages(String name, NetworkCallback<Messages> cb) {
+        HttpUrl url = constructURL(CHANNEL + name + MESSAGE);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(cb);
+    }
+
+    public static void ChannelMessage(String name, String type, JsonObject message, EmptyCallback cb) {
+
+        HttpUrl url = constructURL(CHANNEL + name + MESSAGE);
+
+        Gson gson = new Gson();
+
+        RequestBody body = new FormBody.Builder()
+                .add("type", type)
+                .add("data", message.toString())
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        Call call = client.newCall(request);
+        call.enqueue(cb);
+    }
+
+    // Websocket parts
+
+    private static final class ReceiverWebSocket extends WebSocketListener {
+
+        @Override
+        public void onOpen(WebSocket webSocket, Response response) {
+            System.out.println("WebSocket Listening");
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, String text) {
+            Message m = new Gson().fromJson(text, Message.class);
+            Receiver r = listeners.get(m.type);
+            if(r != null)
+                r.process(m);
+        }
+
+        @Override
+        public void onClosing(WebSocket webSocket, int code, String reason) {
+            webSocket.close(code, null);
+            System.out.println("Closing: " + code + " " + reason);
+        }
+
+        @Override
+        public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+            t.printStackTrace();
+        }
+    }
+
+    private static WebSocket webSocket = null;
+
+    public static void ChannelListen() {
+
+        if(webSocket != null)
+            return;
+
+        HttpUrl url = constructURL(LISTEN_CHANNELS);
+
+        Request request = new Request.Builder()
+                .url(url.toString().replace(SERVER_SCHEME, "ws"))
+                .build();
+
+        webSocket = client.newWebSocket(request, new ReceiverWebSocket());
+    }
+
+    public static void ChannelStopListen() {
+        webSocket.cancel();
+        webSocket = null;
+    }
+
+    /* Listener interface */
+
+    public interface Receiver {
+        void process(Message message);
+    }
+
+    public static HashMap<String,Receiver> listeners = new HashMap<>();
+
+    public static void ChannelAddListener(String type, Receiver listener) {
+        listeners.put(type, listener);
+    }
 
     /************************************************************************/
     /************************* Helper Methods *******************************/
@@ -432,6 +603,8 @@ public final class NetworkHelper {
         }
         return RequestBody.create(JSON, jsonobj.toString());
     }
+
+
 
     /**
      * Constructs a url, as most urls only differ by segment and paramater
