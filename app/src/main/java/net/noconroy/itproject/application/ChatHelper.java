@@ -8,6 +8,9 @@ import com.google.gson.JsonParser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -39,24 +42,22 @@ public final class ChatHelper {
     private static final String TO = "&to=";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    public static String CreateChannel(String name, String access_token) {
-        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public static String CreateChannel(String name, String access_token, Boolean persistent) {
         final OkHttpClient client = new OkHttpClient();
 
-        HttpUrl url = constructURL(CHANNEL + name);
-
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name)
+                .build();
+        //String url = SERVER_ADDRESS + CHANNEL + name;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
-        JSONObject json = new JSONObject();
-        try {
-            json.put("persistent", true);
-            json.put("access_token", access_token);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
-
-        RequestBody body = RequestBody.create(JSON, json.toString());
+        RequestBody body = new FormBody.Builder()
+                .add("persistent", persistent.toString())
+                .add("access_token", access_token)
+                .build();
 
         Request request = new Request.Builder()
                 .url(url)
@@ -76,8 +77,13 @@ public final class ChatHelper {
     public static String DeleteChannel(String name, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        HttpUrl url = constructURL(CHANNEL + name);
-
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name)
+                .build();
+        //String url = SERVER_ADDRESS + CHANNEL + name;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
@@ -102,8 +108,13 @@ public final class ChatHelper {
     public static String SubscribeChannel(String name, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        HttpUrl url = constructURL(CHANNEL + name + JOIN);
-
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name+JOIN)
+                .build();
+       // String url = SERVER_ADDRESS + CHANNEL + name + JOIN;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
@@ -128,7 +139,13 @@ public final class ChatHelper {
     public static String LeaveChannel(String name, String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
-        HttpUrl url = constructURL(CHANNEL + name + LEAVE);
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name+LEAVE)
+                .build();
+        //String url = SERVER_ADDRESS + CHANNEL + name + LEAVE;
 
         access_token = access_token.replaceAll("^\"|\"$", "");
 
@@ -156,35 +173,33 @@ public final class ChatHelper {
         String type = "text/plain; charset=utf-8";
         final OkHttpClient client = new OkHttpClient();
 
-        HttpUrl url = constructURL(CHANNEL + name + MESSAGE,
-                access_token);
-
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .addPathSegments(CHANNEL+name+MESSAGE)
+                .build();
+        //String url = SERVER_ADDRESS + CHANNEL + name + MESSAGE;
         access_token = access_token.replaceAll("^\"|\"$", "");
 
-        JSONObject message_data = new JSONObject();
+        JSONObject jsonMessage = new JSONObject();
         try {
-            message_data.put("channel", name);
-            message_data.put("message_type", type);
-            message_data.put("user", user);
-            message_data.put("message", message);
-
+            jsonMessage.put("channel", name);
+            jsonMessage.put("message_type", "text/plain");
+            jsonMessage.put("message", message);
 
         } catch (JSONException e) {
             e.printStackTrace();
             return e.getMessage();
         }
 
-        JSONObject json = new JSONObject();
-        try {
-            json.put("data", message_data);
-            json.put("type", type);
-            json.put("access_token", access_token);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
+        String msgString = jsonMessage.toString();
 
-        RequestBody body = RequestBody.create(JSON, json.toString());
+        RequestBody body = new FormBody.Builder()
+                .add("data", msgString)
+                .add("type", "text/plain")
+                .add("access_token", access_token)
+                .build();
 
         Request request = new Request.Builder()
                 .url(url)
@@ -194,6 +209,7 @@ public final class ChatHelper {
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
+            System.out.println(Integer.toString(response.code()));
             return Integer.toString(response.code());
         } catch (IOException e) {
             e.printStackTrace();
@@ -253,8 +269,14 @@ public final class ChatHelper {
     public static void ListenChannels(String access_token) {
         final OkHttpClient client = new OkHttpClient();
 
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme(SERVER_SCHEME)
+                .host(SERVER_HOST)
+                .port(SERVER_PORT)
+                .build();
+
         Request request = new Request.Builder()
-                .url(SERVER_ADDRESS)
+                .url(url)
                 .build();
         WebSocket socket = client.newWebSocket(request, new WebSocketListener() {
             public void onOpen() {
