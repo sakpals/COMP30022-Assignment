@@ -23,6 +23,7 @@ import net.noconroy.itproject.application.AR.LocationService;
 import net.noconroy.itproject.application.AR.LocationServiceProvider;
 
 import net.noconroy.itproject.application.Chat.ChatActivity;
+import net.noconroy.itproject.application.callbacks.EmptyCallback;
 
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS;
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS_KEY;
@@ -99,15 +100,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logout(View view) {
-        Intent intent = new Intent(this, HomeActivity.class);
+        final Intent intent = new Intent(this, HomeActivity.class);
         SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
         settings.edit().remove(AT_PREFS_KEY).commit();
 
         stopLocationService();
-        NetworkHelper.Logout(access_token);
+        NetworkHelper.Logout(access_token, new EmptyCallback() {
+            @Override
+            public void onSuccess(Void object) {
+                startActivity(intent);
+                finish();
+            }
 
-        startActivity(intent);
-        finish();
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        });
     }
 
     public void camera(View view){

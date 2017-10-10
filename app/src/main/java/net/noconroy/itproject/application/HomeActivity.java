@@ -33,6 +33,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,11 +44,6 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 public class HomeActivity extends AppCompatActivity {
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
 
     public static final String AT_PREFS = "AccessTokenPrefs";
     public static final String AT_PREFS_KEY = "AccessTokenPrefs_KEY";
@@ -91,15 +88,55 @@ public class HomeActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
     }
 
+    private void authSuccessful(String access_token) {
+        showProgress(false);
+
+        Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
+        startActivity(intent);
+        finish();
+    }
+
+    private void attemptAuthentication(final String username, final String password) {
+
+        final AuthenticationCallback registerCallback = new AuthenticationCallback() {
+            @Override
+            public void onAuthenticated(String access_token) {
+                SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
+                settings.edit().putString(AT_PREFS_KEY, access_token).commit();
+                authSuccessful(access_token);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                showProgress(false);
+            }
+        };
+
+        AuthenticationCallback loginCallback = new AuthenticationCallback() {
+            @Override
+            public void onAuthenticated(String access_token) {
+                SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
+                settings.edit().putString(AT_PREFS_KEY, access_token).commit();
+                authSuccessful(access_token);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                NetworkHelper.Register(username, password, "", "", registerCallback);
+            }
+        };
+
+        NetworkHelper.Login(username, password, loginCallback);
+
+    }
+
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mEmailView.setError(null);
@@ -134,8 +171,7 @@ public class HomeActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            attemptAuthentication(email, password);
         }
     }
 
@@ -144,10 +180,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void checkLogin() {
-        // TODO get stored access_token
         SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
         String access_token = settings.getString(AT_PREFS_KEY, "");
-        if(!access_token.equals("")) goToMainActivity(access_token);
+        if(!access_token.equals("")) authSuccessful(access_token);
     }
 
     /**
@@ -183,66 +218,6 @@ public class HomeActivity extends AppCompatActivity {
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
-    private void goToMainActivity(String access_token) {
-        // Send an intent to main activity with the user's access token
-        Intent intent = new Intent(HomeActivity.this, MainActivity.class);
-        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
-        startActivity(intent);
-        finish();
-    }
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-        private String access_token;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            access_token = NetworkHelper.Login(mEmail, mPassword);
-
-            if (access_token != null) return true;
-
-            access_token = NetworkHelper.Register(mEmail, mPassword, "", "");
-
-            if (access_token != null) return true;
-
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
-                settings.edit().putString(AT_PREFS_KEY, access_token).commit();
-                goToMainActivity(access_token);
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
         }
     }
 }
