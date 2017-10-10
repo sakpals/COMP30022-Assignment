@@ -1,6 +1,7 @@
 package net.noconroy.itproject.application;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -65,10 +66,22 @@ public class ChatHelperUnitTest {
         String channel_name = UUID.randomUUID().toString();
         ChatHelper.CreateChannel(channel_name, access_token);
         ChatHelper.SubscribeChannel(channel_name, access_token2);
-        if (!ChatHelper.MessageChannel(channel_name, "test_message", access_token2).equals("200"))
+        if (!ChatHelper.MessageChannel(channel_name, username2, "test_message", access_token2).equals("200"))
             throw new AssertionError();
     }
 
+    @Test
+    public void GetMessagesTest() {
+        String channel_name = UUID.randomUUID().toString();
+        ChatHelper.CreateChannel(channel_name, access_token);
+        ChatHelper.SubscribeChannel(channel_name, access_token2);
+        ChatHelper.MessageChannel(channel_name, username2, "test_message", access_token2);
+        String msg = ChatHelper.GetMessages(channel_name, "0", "0", access_token);
+        if (msg.isEmpty())
+            throw new AssertionError();
+        System.out.println(msg);
+    }
+/*
     @Test
     public void ListenChannelsTest() {
         String channel_name = UUID.randomUUID().toString();
@@ -76,6 +89,7 @@ public class ChatHelperUnitTest {
         ChatHelper.SubscribeChannel(channel_name, access_token2);
         ChatHelper.ListenChannels(access_token2);
     }
+*/
 }
 
 
