@@ -13,12 +13,15 @@ package net.noconroy.itproject.application;
 import android.util.Log;
 
 import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+
+import okhttp3.Call;
 
 import static org.junit.Assert.assertEquals;
 
@@ -60,19 +63,23 @@ public class NetworkHelperUnitTest {
 
         // Register user
         String username = UUID.randomUUID().toString();
+
+        AuthenticationCallback cb = new AuthenticationCallback() {
+            @Override
+            public void onAuthenticated(String access_token) {
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                throw new AssertionError(f.msg);
+            }
+        };
+
         NetworkHelper.Register(username, test_password,
-                test_avatar_url, test_description, new AuthenticationCallback() {
-                    @Override
-                    public void onAuthenticated(String access_token) {
+                test_avatar_url, test_description, cb);
 
-                    }
-
-                    @Override
-                    public void onFailure(Failure f) {
-                        throw new AssertionError(f.msg);
-                    }
-                });
-        Thread.sleep(10000);
+        cb.waitDone();
     }
 
 
