@@ -86,7 +86,6 @@ public class ChatHelperUnitTest {
         String msg = ChatHelper.GetAllMessages(channel_name, access_token);
         if (msg.isEmpty())
             throw new AssertionError();
-        System.out.println(msg);
     }
 /*
     @Test
