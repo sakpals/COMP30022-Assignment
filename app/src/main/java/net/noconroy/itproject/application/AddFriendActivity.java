@@ -11,6 +11,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
+
 
 public class AddFriendActivity extends AppCompatActivity {
 
@@ -20,16 +23,12 @@ public class AddFriendActivity extends AppCompatActivity {
     private EditText mSearchUser;
     private Button mFindUserButton;
 
-    private AddFriendActivity.AddUserAsFriendTask mTask = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
 
         Intent i = getIntent();
-        String access_token = i.getStringExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE);
-        this.access_token = access_token;
 
         mSearchUser = (EditText) findViewById(R.id.username_search);
         mFindUserButton = (Button) findViewById(R.id.find_friend_button);
@@ -48,11 +47,8 @@ public class AddFriendActivity extends AppCompatActivity {
      * Attempts to find a user via asynchronous task.
      */
     public void attemptFindUser() {
-        if(mTask != null) {
-            return;
-        }
-        String username = null;
-        username = mSearchUser.getText().toString();
+
+        String username = mSearchUser.getText().toString();
 
         if(TextUtils.isEmpty(username) || username == null) {
             mSearchUser.setError("No username entered");
@@ -62,64 +58,28 @@ public class AddFriendActivity extends AppCompatActivity {
         else {
             Toast t = Toast.makeText(getApplicationContext(), "Attempting to add friend: "+username, Toast.LENGTH_SHORT);
             t.show();
-            // begin background asynchronous task of adding friend
-            mTask = new AddUserAsFriendTask(username, access_token);
-            mTask.execute((Void) null);
+
+            NetworkHelper.AddFriend(username, new EmptyCallback() {
+                @Override
+                public void onSuccess(Void object) {
+                    Toast t = Toast.makeText(getApplicationContext(), "Sent friend request!", Toast.LENGTH_SHORT);
+                    t.show();
+                }
+
+                @Override
+                public void onFailure(Failure f) {
+                    if(f.code == 400) {
+                        runOnUiThread(already_sent_request_error);
+                    }
+                    else if(f.code == 404) {
+                        runOnUiThread(user_does_not_exist);
+                    }
+                    else if(f.code == 500) {
+                        runOnUiThread(general_error);
+                    }
+                }
+            });
         }
-    }
-
-    /**
-     * Asynchronous task of adding user as friend, which sends a friend request to future friend.
-     * Calls NetworkHelper method 'AddFriend'.
-     */
-    public class AddUserAsFriendTask extends AsyncTask<Void, Void, Boolean> {
-
-        private String mUsername;
-        private String access_token;
-        private String response;
-
-        public AddUserAsFriendTask(String username, String access_token) {
-            this.mUsername = username;
-            this.access_token = access_token;
-        }
-
-        @Override
-        protected  Boolean doInBackground(Void... params) {
-            response = NetworkHelper.AddFriend(mUsername, access_token);
-            if(response.equals("400")) {
-                runOnUiThread(already_sent_request_error);
-                return false;
-            }
-            else if(response.equals("404")) {
-                runOnUiThread(user_does_not_exist);
-                return false;
-            }
-            else if(response.equals("500")) {
-                runOnUiThread(general_error);
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mTask = null;
-            if(success) {
-                Toast t = Toast.makeText(getApplicationContext(), "Sent friend request!", Toast.LENGTH_SHORT);
-                t.show();
-            }
-            else {
-                // do nothing, handle errors from Runnable objects (in main thread)
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mTask = null;
-        }
-
     }
 
     /* Handles server errors. To be run in the main thread. */

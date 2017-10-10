@@ -10,8 +10,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
+import net.noconroy.itproject.application.models.IncomingFriendRequests;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by sampadasakpal on 9/10/17.
@@ -19,41 +24,30 @@ import java.util.HashMap;
 
 public class FriendRequestAdapter extends BaseAdapter {
 
-
-        private ArrayList<String> mUsernamesList;
-        private String access_token;
-        private ArrayList mFriendshipTokensList;
-        private HashMap<String, String> mRequests;
-        private Context mContext;
-        public Button mAcceptButton;
-        private FriendRequestsActivity mActivity;
-        private FriendRequestAdapter.AcceptFriendRequestTask mAcceptTask = null;
+    private IncomingFriendRequests mRequests;
+    private Context mContext;
+    public Button mAcceptButton;
+    private FriendRequestsActivity mActivity;
 
         /**
          * Constructor
          * @param requests a particular request by another user
          * @param context application context
-         * @param access_token user (who is accepting requests) access_token
          */
-        public FriendRequestAdapter(HashMap<String, String> requests, Context context, String access_token, FriendRequestsActivity friendRequestsActivity) {
+        public FriendRequestAdapter(IncomingFriendRequests requests, Context context, FriendRequestsActivity friendRequestsActivity) {
             this.mRequests = requests;
             this.mContext = context;
-            mUsernamesList = new ArrayList<String>();
-            mUsernamesList.addAll(mRequests.keySet());
-            mFriendshipTokensList = new ArrayList<String>();
-            mFriendshipTokensList.addAll(mRequests.values());
-            this.access_token = access_token;
             mActivity = friendRequestsActivity;
         }
 
         @Override
         public int getCount() {
-            return mUsernamesList.size();
+            return mRequests.requests.size();
         }
 
         @Override
         public Object getItem(int pos) {
-            return mUsernamesList.get(pos);
+            return mRequests.requests.get(pos);
         }
 
         @Override
@@ -78,7 +72,7 @@ public class FriendRequestAdapter extends BaseAdapter {
 
             // sets the username for a row
             final TextView username = (TextView) view.findViewById(R.id.Username);
-            username.setText(mUsernamesList.get(pos));
+            username.setText(mRequests.requests.get(pos).profile.username);
 
             // button to accept
             mAcceptButton = (Button) view.findViewById(R.id.AcceptRequestButton);
@@ -87,97 +81,37 @@ public class FriendRequestAdapter extends BaseAdapter {
             mAcceptButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    acceptFriendRequest(mRequests.get(username.getText()), access_token);
+                    NetworkHelper.AcceptFriend(mRequests.requests.get(pos).token, new EmptyCallback() {
+                        @Override
+                        public void onSuccess(Void object) {
+                            Toast.makeText(mActivity.getApplicationContext(), "ACCEPTED!", Toast.LENGTH_SHORT).show();
+                            removeRequest();
+                        }
+
+                        @Override
+                        public void onFailure(Failure f) {
+                            if(f.code == 404) {
+                                mActivity.runOnUiThread(already_accepted_request_error);
+                            }
+
+                            if(f.code == 400) {
+                                mActivity.runOnUiThread(already_friends_error);
+                                removeRequest();
+                            }
+
+                            if(f.code == 500) {
+                                mActivity.runOnUiThread(accept_request_error);
+                            }
+                        }
+                    });
                 }
             });
             return view;
         }
 
-        /**
-         * Calls an asynchronous task to accept a friend request. This method is called when
-         * the user clicks on the accept button for a particular friend request.
-         * @param friendship_token belonging to the future friend to be accepted
-         * @param access_token belonging to the user
-         */
-        public void acceptFriendRequest(String friendship_token, String access_token) {
-
-            if(mAcceptTask != null) {
-                return;
-            }
-            else {
-                mAcceptTask = new AcceptFriendRequestTask(friendship_token, access_token);
-                mAcceptTask.execute((Void) null);
-            }
+        private void removeRequest() {
+            mActivity.updateRequests();
         }
-
-        /**
-         * Asynchronous task that accepts a friend request by calling upon NetworkHelper
-         * method 'AcceptFriend'. Handles errors in the main thread.
-         */
-        public class AcceptFriendRequestTask extends AsyncTask<Void, Void, Boolean> {
-
-            private String mFriendship_token;
-            private String access_token;
-            private String response;
-
-            public AcceptFriendRequestTask(String friendship_token, String access_token) {
-                this.mFriendship_token = friendship_token;
-                this.access_token = access_token;
-            }
-
-            @Override
-            protected  Boolean doInBackground(Void... params) {
-                response = NetworkHelper.AcceptFriend(mFriendship_token, access_token);
-                if(response.equals("404")) {
-                    mActivity.runOnUiThread(already_accepted_request_error);
-                    return false;
-                }
-                else if(response.equals("400")) {
-                    mActivity.runOnUiThread(already_friends_error);
-                    removeRequest(mFriendship_token);
-                    mActivity.updateRequests();
-                    return false;
-                }
-                else if(response.equals("500")) {
-                    mActivity.runOnUiThread(accept_request_error);
-                    return false;
-                }
-                else {
-                    return true;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(final Boolean success) {
-                mAcceptTask = null;
-                if(success) {
-                    Toast.makeText(mActivity.getApplicationContext(), "ACCEPTED!", Toast.LENGTH_SHORT).show();
-                    removeRequest(mFriendship_token);
-                    mActivity.updateRequests();
-                }
-                // errors handled on main thread
-            }
-
-            @Override
-            protected void onCancelled() {
-                mAcceptTask = null;
-            }
-
-            /**
-             * Updates the friend requests list in the current view
-             * @param friendship_token
-             */
-            public void removeRequest(String friendship_token) {
-                for(int pos = 0; pos < mFriendshipTokensList.size(); pos++) {
-                    if(mFriendshipTokensList.get(pos).equals(friendship_token)) {
-                        mUsernamesList.remove(pos);
-                        break;
-                    }
-                }
-            }
-        }
-
-        /* Handles errors generated when accepting friends. To be run on the main thread. */
 
         /**
          * Handles the case when a user has already accepted a friend.

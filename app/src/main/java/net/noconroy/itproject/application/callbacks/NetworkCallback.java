@@ -34,6 +34,10 @@ public abstract class NetworkCallback<T> implements Callback {
     public class Failure {
         public int code;
         public String msg;
+
+        public String toString() {
+            return "ERR: " + code + ", MSG: " + msg;
+        }
     }
 
     @Override
@@ -49,11 +53,15 @@ public abstract class NetworkCallback<T> implements Callback {
     public void onResponse(Call call, Response response) throws IOException {
         if(response.isSuccessful()) {
             Gson gson = new Gson();
-            T obj = gson.fromJson(response.body().charStream(), type);
-            onSuccess(obj);
+            if(type != null) {
+                T obj = gson.fromJson(response.body().string(), type);
+                onSuccess(obj);
+            } else {
+                onSuccess(null);
+            }
         } else {
             Gson gson = new Gson();
-            Failure f = gson.fromJson(response.body().charStream(), Failure.class);
+            Failure f = gson.fromJson(response.body().string(), Failure.class);
             f.code = response.code();
             onFailure(f);
         }
@@ -70,7 +78,8 @@ public abstract class NetworkCallback<T> implements Callback {
     }
 
     public void waitDone() {
-        while(!finished) {
+        int counter = 50;
+        while(!finished && counter-- > 0) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

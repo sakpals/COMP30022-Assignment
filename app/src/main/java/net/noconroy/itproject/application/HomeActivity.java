@@ -92,7 +92,7 @@ public class HomeActivity extends AppCompatActivity {
         showProgress(false);
 
         Intent intent = new Intent(HomeActivity.this, MainActivity.class);
-        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
+        intent.putExtra(MainActivity.ACCESS_TOKEN_INTENT_KEY, access_token);
         startActivity(intent);
         finish();
     }

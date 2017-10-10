@@ -30,9 +30,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import net.noconroy.itproject.application.AppLifecycleHandler;
+import net.noconroy.itproject.application.DataStorage;
 import net.noconroy.itproject.application.MainActivity;
 import net.noconroy.itproject.application.NetworkHelper;
 import net.noconroy.itproject.application.RegisterActivity;
+import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -111,17 +114,17 @@ public class LocationService extends Service {
     // Time used to extend the location updating - represented in seconds
     public float extendedLocationTimer = 0;
 
+    private DataStorage ds = null;
+
 
     /***************************************************************************************/
     /**************************** Overrideable Class Methods  ******************************/
     /***************************************************************************************/
 
-    private String access_token = null;
-
-
     @Override
     public void onCreate() {
         super.onCreate();
+        ds = DataStorage.getInstance();
 
         mRequestingLocationUpdates = false;
         mLastUpdateTime = "";
@@ -266,71 +269,32 @@ public class LocationService extends Service {
      */
     public void updateLocation() {
 
-        // If a user has been registered
-        if (mCurrentLocation != null && mRequestingLocationUpdates) if (access_token != null) {
-
-            AsyncTask mTask = new SendLocationToServer(this.access_token);
-            mTask.execute();
-        } else {
-            Log.i(TAG, "Access Token has not been registered -- can't update server!");
-            // Try get the access token again
-            try {
-                if (!RegisterActivity.ACCESS_TOKEN_MESSAGE.equals("user_access_token")) {
-                    ;
-                }
-                else {
-                    access_token = RegisterActivity.ACCESS_TOKEN_MESSAGE;
-                }
-            } catch (Exception e) {
-                Log.i(TAG, "Issue with retrieving the access token from Register Activity!");
-            }
-        }
-        else if (mCurrentLocation == null) {
+        if (mCurrentLocation == null) {
             Log.i(TAG, "mCurrentLocation is currently null.");
+            return;
         }
-        else if (!mRequestingLocationUpdates) {
+
+        if (!mRequestingLocationUpdates) {
             Log.i(TAG, "User is currently not requesting and location updates.");
+            return;
         }
+
+        NetworkHelper.UpdateLocation(ds.me.username,
+                mCurrentLocation.getLatitude(),
+                mCurrentLocation.getLongitude(), new EmptyCallback(){
+
+                    @Override
+                    public void onSuccess(Void object) {
+
+                    }
+
+                    @Override
+                    public void onFailure(Failure f) {
+
+                    }
+                });
     }
 
-    public class SendLocationToServer extends AsyncTask<Object, Void, Boolean> {
-
-        private String access_token;
-        private String status;
-
-        public SendLocationToServer(String access_token) {
-            this.access_token = access_token;
-        }
-
-        @Override
-        protected Boolean doInBackground(Object... params) {
-            status = NetworkHelper.UpdateLocation("bob111",
-                    String.valueOf(mCurrentLocation.getLatitude()),
-                    String.valueOf(mCurrentLocation.getLongitude()),
-                    access_token);
-            if(!status.equals("200")) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if(success) {
-                Log.i(TAG, "Location has been updated.");
-            }
-            else {
-                ;
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            ;
-        }
-    }
 
 
     /**
@@ -389,6 +353,5 @@ public class LocationService extends Service {
     public void registerClient(MainActivity activity) {
         this.currentActivity = activity;
     }
-    public void registerAccessToken(String access_token) { this.access_token = access_token; }
     public Location getLocation() {return mCurrentLocation;}
 }

@@ -47,7 +47,7 @@ public final class ChatHelper {
 
         RequestBody body = new FormBody.Builder()
                 .add("persistent", persistent.toString())
-                .add("access_token", access_token)
+                .add("ACCESS_TOKEN", access_token)
                 .build();
 
         Request request = new Request.Builder()
@@ -78,7 +78,7 @@ public final class ChatHelper {
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
-                .add("access_token", access_token)
+                .add("ACCESS_TOKEN", access_token)
                 .build();
 
         Request request = new Request.Builder()
@@ -109,7 +109,7 @@ public final class ChatHelper {
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
-                .add("access_token", access_token)
+                .add("ACCESS_TOKEN", access_token)
                 .build();
 
         Request request = new Request.Builder()
@@ -140,7 +140,7 @@ public final class ChatHelper {
         access_token = access_token.replaceAll("^\"|\"$", "");
 
         RequestBody body = new FormBody.Builder()
-                .add("access_token", access_token)
+                .add("ACCESS_TOKEN", access_token)
                 .build();
 
         Request request = new Request.Builder()
@@ -186,7 +186,7 @@ public final class ChatHelper {
         RequestBody body = new FormBody.Builder()
                 .add("data", msgString)
                 .add("type", "text/plain")
-                .add("access_token", access_token)
+                .add("ACCESS_TOKEN", access_token)
                 .build();
 
         Request request = new Request.Builder()

@@ -2,6 +2,8 @@ package net.noconroy.itproject.application.callbacks;
 
 import com.google.gson.JsonObject;
 
+import net.noconroy.itproject.application.DataStorage;
+
 /**
  * Created by matt on 10/10/17.
  */
@@ -20,6 +22,7 @@ public abstract class AuthenticationCallback extends NetworkCallback<Authenticat
 
     @Override
     public void onSuccess(AccessToken o) {
+        DataStorage.getInstance().setAccessToken(o);
         onAuthenticated(o.access_token);
     }
 }
