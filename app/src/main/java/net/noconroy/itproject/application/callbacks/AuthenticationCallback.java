@@ -18,6 +18,9 @@ public abstract class AuthenticationCallback extends NetworkCallback<Authenticat
         public String access_token;
     }
 
+    /**
+     * @param a Activity to perform UI actions in, can be null
+     */
     public AuthenticationCallback(Activity a) {
         super(AccessToken.class, a);
     }

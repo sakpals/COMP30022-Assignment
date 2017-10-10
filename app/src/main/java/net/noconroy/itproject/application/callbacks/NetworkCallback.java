@@ -23,11 +23,19 @@ public abstract class NetworkCallback<T> implements Callback {
     Class<T> type;
     Activity ctx;
 
-    public NetworkCallback(Class<T> _type, Activity _ctx) {
+    /**
+     *
+     * @param _type T class eg. (Friends.class)
+     * @param a Activity to perform UI in. Can be null
+     */
+    public NetworkCallback(Class<T> _type, Activity a) {
         type = _type;
-        ctx = _ctx;
+        ctx = a;
     }
 
+    /**
+     *  Runnable to run in thread. Can be run with Runnable.run()
+     */
     private class SuccessRunnable implements Runnable {
         Call call;
         Response response;
@@ -63,6 +71,9 @@ public abstract class NetworkCallback<T> implements Callback {
         }
     }
 
+    /**
+     *  Runnable to run in thread. Can be run with Runnable.run()
+     */
     private class FailureRunnable implements Runnable {
 
         Call call;

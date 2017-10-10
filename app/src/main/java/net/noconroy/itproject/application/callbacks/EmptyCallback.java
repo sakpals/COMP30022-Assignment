@@ -8,6 +8,9 @@ import android.support.annotation.Nullable;
  */
 
 public abstract class EmptyCallback extends NetworkCallback<Void> {
+    /**
+     * @param a Activity to perform UI actions in, can be null
+     */
     public EmptyCallback(Activity a) {
         super(null, a);
     }
