@@ -48,6 +48,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Get the Intent that started this activity and extract the string
+        Intent intent = getIntent();
+        String access_token = intent.getStringExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE);
+        this.access_token = access_token;
+
+        // Set all location parameters
         mLocationServiceIntent = null;
         mLocationService = null;
         locationServiceBound = false;
@@ -57,11 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set this main activity as the main activity of our app lifecycle handler
         AppLifecycleHandler.setMainActivity(this);
-      
-        // Get the Intent that started this activity and extract the string
-        Intent intent = getIntent();
-        String access_token = intent.getStringExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE);
-        this.access_token = access_token;
+
         if (access_token != null) {
 
             // Hide register button
@@ -113,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Using this as temporary example to extend location timer
         // extend timer for 5 minutes
-        if (LocationServiceProvider.extendLocationUpdates(0.5f)) {
+        if (!LocationServiceProvider.extendLocationUpdates(0.5f)) {
             Log.d(TAG, "can't extend location updates");
         }
     }
@@ -208,8 +211,9 @@ public class MainActivity extends AppCompatActivity {
             // Note this is asynchronous -- so have to start the service within this task
             mLocationService = ((LocationService.LocationBinder) service).getService();
             mLocationService.registerClient(MainActivity.this);
+            mLocationService.registerAccessToken(access_token);
             startService(mLocationServiceIntent);
-
+;
             // We also add this location service to LocationServiceProvider
             LocationServiceProvider.createLocationService(mLocationService);
 

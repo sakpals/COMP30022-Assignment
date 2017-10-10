@@ -1,18 +1,17 @@
 package net.noconroy.itproject.application;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import net.noconroy.itproject.application.AR.LocationServiceProvider;
+
 import java.util.ArrayList;
 
 /**
@@ -21,6 +20,7 @@ import java.util.ArrayList;
  */
 public class Friends extends AppCompatActivity {
 
+    private static final String TAG = "Friends";
     private String access_token = null;
     private Friends.FriendsListTask mTask = null;
 
@@ -135,4 +135,57 @@ public class Friends extends AppCompatActivity {
     public void updateFriendsList() {
         mFriendsListAdapter.notifyDataSetChanged();
     }
+
+
+
+    private void ShareLocation() {
+        if (!LocationServiceProvider.extendLocationUpdates(0.5f)) {
+            Log.d(TAG, "can't extend location updates");
+        } else {
+            try {
+                AsyncTask shareLocation = new ShareLocationWithFriends(access_token);
+                shareLocation.execute();
+            } catch (Exception e) {
+                Log.i(TAG, "Issue with error");
+            }
+        }
+    }
+
+    public class ShareLocationWithFriends extends AsyncTask<Object, Void, Boolean> {
+
+        private String access_token;
+        private String status;
+
+        public ShareLocationWithFriends(String access_token) {
+            this.access_token = access_token;
+        }
+
+        @Override
+        protected Boolean doInBackground(Object... params) {
+            status = NetworkHelper.UpdateLocationSettings("bob111", access_token);
+            if(!status.equals("200")) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if(success) {
+                Log.i(TAG, "Location has been shared with friends.");
+            }
+            else {
+                ;
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            ;
+        }
+    }
+
+
 }

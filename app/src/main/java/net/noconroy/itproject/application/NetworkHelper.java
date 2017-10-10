@@ -35,16 +35,15 @@ public final class NetworkHelper {
     /********************* Constants ****************************************/
     /************************************************************************/
 
-    private static final String SERVER_SCHEME = "http";
-    private static final String SERVER_HOST ="127.0.0.1";
-    private static final Integer SERVER_PORT = 5000;
+    private static final String SERVER_SCHEME = "https";
+    private static final String SERVER_HOST ="itproject.noconroy.net";
+    private static final Integer SERVER_PORT = 443;
     private static final String JSON_HEADER_NAME = "content-type";
     private static final String ACCESS_TOKEN_NAME = "access_token";
     private static final String JSON_HEADER_VALUE = "application/json; " +
             "charset=utf-8";
     private static final MediaType JSON = MediaType.parse("Content-Type: " +
             "application/json");
-    private static final String SERVER_ADDRESS = "http://127.0.0.1:5000";
     private static final String USER_LOGIN = "user/login";
     private static final String USER_LOGOUT = "user/logout";
     private static final String USER_REGISTER = "user/register";
@@ -57,6 +56,7 @@ public final class NetworkHelper {
     private static final String FRIEND_REQUESTS_IN = "friends/requests/in";
     private static final String FRIEND_REQUESTS_OUT = "friends/requests/out";
     private static final String LOCATION = "location/";
+    private static final String LOCATION_SHARE = "/share";
 
 
     /************************************************************************/
@@ -320,6 +320,41 @@ public final class NetworkHelper {
             return e.getMessage();
         }
     }
+
+    /**
+     * Make it so that the user is sharing his/her location with all friends.
+     *
+     * @param username
+     * @param access_token
+     * @return
+     */
+    public static String UpdateLocationSettings(String username, String access_token) {
+        final OkHttpClient client = new OkHttpClient();
+
+        // Create an empty body
+        RequestBody body = RequestBody.create(null, new byte[0]);
+
+        // Remove quotation marks so it is in the correct format for okhttp3
+        access_token = removeQuotations(access_token);
+
+        HttpUrl url = constructURL(LOCATION + username + LOCATION_SHARE, access_token);
+
+        Request request = new Request.Builder()
+                .addHeader(JSON_HEADER_NAME, JSON_HEADER_VALUE)
+                .url(url)
+                .post(body)
+                .build();
+
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            return Integer.toString(response.code());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
 
 
     /**
@@ -673,7 +708,7 @@ public final class NetworkHelper {
 
 
     // Removes quotation marks from a string
-    private static String removeQuotations(String str){
+    public static String removeQuotations(String str){
         return str.replaceAll("^\"|\"$", "");
     }
 
