@@ -26,7 +26,7 @@ import java.util.UUID;
 import okhttp3.Call;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.fail;
 
 
 public class NetworkHelperUnitTest {
@@ -102,7 +102,7 @@ public class NetworkHelperUnitTest {
 
         NewUser failed = newUser(nu.username);
 
-        if(failed.access_token != null) throw new AssertionError("Server allowed duplicate rego");
+        if(failed.access_token != null) fail("Server allowed duplicate rego");
     }
 
 
@@ -118,12 +118,12 @@ public class NetworkHelperUnitTest {
                 // Checks for whitespaces in ACCESS_TOKEN, which usually occers if the
                 // server is offline
                 if (access_token.matches(".*\\s+.*"))
-                    throw new AssertionError(server_offline_error);
+                    fail(server_offline_error);
 
                 // Indicates the server has responded with a HTTP error, and not a
                 // username
                 if (!access_token.matches(".*[a-z].*"))
-                    throw new AssertionError(access_token);
+                    fail(access_token);
             }
 
             @Override
@@ -153,7 +153,7 @@ public class NetworkHelperUnitTest {
 
             @Override
             public void onFailure(Failure f) {
-                throw new AssertionError(f);
+                fail(f.toString());
             }
         };
 
@@ -173,7 +173,7 @@ public class NetworkHelperUnitTest {
         final EmptyCallback second = new EmptyCallback() {
             @Override
             public void onSuccess(Void object) {
-                throw new AssertionError("Succeeded logging out twice");
+                fail("Succeeded logging out twice");
             }
 
             @Override
@@ -192,7 +192,7 @@ public class NetworkHelperUnitTest {
 
             @Override
             public void onFailure(Failure f) {
-                throw new AssertionError(f);
+                fail(f.toString());
             }
         };
 
@@ -217,7 +217,7 @@ public class NetworkHelperUnitTest {
 
             @Override
             public void onFailure(Failure f) {
-                throw new AssertionError(f);
+                fail(f.toString());
             }
         };
 
@@ -324,7 +324,7 @@ public class NetworkHelperUnitTest {
                 wrong_password, test_avatar_url, test_description2, access_token2);
 
         // Throw error if the server accepts this
-        if (isAccepted(response)) throw new AssertionError(response);
+        if (isAccepted(response)) fail(response);
     }
 
 
@@ -344,7 +344,7 @@ public class NetworkHelperUnitTest {
 
         // Throws exception if the server doesn't accept this location update
         if (!isAccepted(response))
-            throw new AssertionError(response);
+            fail(response);
     }
 
 
@@ -363,27 +363,27 @@ public class NetworkHelperUnitTest {
         String response = NetworkHelper.UpdateLocation(username, "??", "15",
                 ACCESS_TOKEN);
         if (isAccepted(response))
-            throw new AssertionError(response);
+            fail(response);
 
         response = NetworkHelper.UpdateLocation(username, "sdad", "15",
                 ACCESS_TOKEN);
-        if (!response.equals("400")) throw new AssertionError(response);
+        if (!response.equals("400")) fail(response);
 
         response = NetworkHelper.UpdateLocation(username, "10", "??",
                 ACCESS_TOKEN);
-        if (!response.equals("400")) throw new AssertionError(response);
+        if (!response.equals("400")) fail(response);
 
         response = NetworkHelper.UpdateLocation(username, "10", "sdad",
                 ACCESS_TOKEN);
-        if (!response.equals("400")) throw new AssertionError(response);
+        if (!response.equals("400")) fail(response);
 
         response = NetworkHelper.UpdateLocation(username, " ", "sdad",
                 ACCESS_TOKEN);
-        if (!response.equals("400")) throw new AssertionError(response);
+        if (!response.equals("400")) fail(response);
 
         response = NetworkHelper.UpdateLocation(username, "10", " ",
                 ACCESS_TOKEN);
-        if (!response.equals("400")) throw new AssertionError(response);
+        if (!response.equals("400")) fail(response);
     }
 
 
@@ -405,9 +405,9 @@ public class NetworkHelperUnitTest {
 
         // Tests that the location correctly updates to the defult values
         if (!NetworkHelper.RetrieveLocation(username, ACCESS_TOKEN)[0].equals(default_lat))
-            throw new AssertionError(response);
+            fail(response);
         if (!NetworkHelper.RetrieveLocation(username, ACCESS_TOKEN)[1].equals(default_lon))
-            throw new AssertionError(response);
+            fail(response);
     }
 
 
@@ -434,7 +434,7 @@ public class NetworkHelperUnitTest {
         // server allows this to occur
         String response = NetworkHelper.UpdateLocation(username1, test_lat2, test_lon2,
                 access_token2);
-        if (isAccepted(response)) throw new AssertionError(response);
+        if (isAccepted(response)) fail(response);
 
     }
 
@@ -456,7 +456,7 @@ public class NetworkHelperUnitTest {
         String response = NetworkHelper.AddFriend(username1, access_token2);
 
         // Checks that the server accepted this request
-        if (!isAccepted(response)) throw new AssertionError(response);
+        if (!isAccepted(response)) fail(response);
     }
 
 
@@ -484,7 +484,7 @@ public class NetworkHelperUnitTest {
         String response = NetworkHelper.AddFriend(username1, access_token2);
 
         // Checks that the server doesn't accept the second friend request
-        if (isAccepted(response)) throw new AssertionError(response);
+        if (isAccepted(response)) fail(response);
     }
 
 
@@ -517,12 +517,12 @@ public class NetworkHelperUnitTest {
         // Checks that user 1 now has user 2 as a friend
         if (!NetworkHelper.GetFriends(access_token1).get(0).get(0)
             .equals(username2))
-            throw new AssertionError();
+            fail();
 
         // Checks that user 2 now has user 1 as a friend
         if (!NetworkHelper.GetFriends(access_token1).get(0).get(0)
                 .equals(username2))
-            throw new AssertionError();
+            fail();
     }
 
 
@@ -558,7 +558,7 @@ public class NetworkHelperUnitTest {
 
         // Checks that the server rejects user 2 accepting friend request,
         // as only the target user should be able to accept the friend request
-        if (isAccepted(response)) throw new AssertionError(response);
+        if (isAccepted(response)) fail(response);
     }
 
 
@@ -613,11 +613,11 @@ public class NetworkHelperUnitTest {
         // User 1 gets gets a list of his friends and des
         ArrayList<ArrayList<String>> out = NetworkHelper.GetFriends(access_token1);
 
-        if (out.size() != 2) throw new AssertionError();
-        if (!out.get(0).get(0).equals(username2)) throw new AssertionError();
-        if (!out.get(0).get(1).equals(test_description2)) throw new AssertionError();
-        if (!out.get(1).get(0).equals(username3)) throw new AssertionError();
-        if (!out.get(1).get(1).equals(test_description3)) throw new AssertionError();
+        if (out.size() != 2) fail();
+        if (!out.get(0).get(0).equals(username2)) fail();
+        if (!out.get(0).get(1).equals(test_description2)) fail();
+        if (!out.get(1).get(0).equals(username3)) fail();
+        if (!out.get(1).get(1).equals(test_description3)) fail();
     }
 
 
@@ -656,9 +656,9 @@ public class NetworkHelperUnitTest {
 
         // Check that both users now have no friends
         if (NetworkHelper.GetFriends(access_token1).size() != 0)
-            throw new AssertionError(response);
+            fail(response);
         if (NetworkHelper.GetFriends(access_token2).size() != 0)
-            throw new AssertionError(response);
+            fail(response);
     }
 
 
@@ -681,9 +681,9 @@ public class NetworkHelperUnitTest {
         // Checks that there are no friend requests present before
         // they are sent
         if (NetworkHelper.GetIncomingFriendRequests(access_token2) != null)
-            throw new AssertionError();
+            fail();
         if (NetworkHelper.GetIncomingFriendRequests(access_token1) != null)
-            throw new AssertionError();
+            fail();
 
         // User 2 sends friend request to user 1
         NetworkHelper.AddFriend(username1, access_token2);
@@ -692,7 +692,7 @@ public class NetworkHelperUnitTest {
         HashMap<String, String> out = NetworkHelper.GetIncomingFriendRequests(access_token1);
 
         // Checks that user 2's friend request is received by user 1
-        if (!out.keySet().contains(username2)) throw new AssertionError();
+        if (!out.keySet().contains(username2)) fail();
     }
 
 
@@ -717,7 +717,7 @@ public class NetworkHelperUnitTest {
         if (NetworkHelper.GetOutgoingFriendRequests(access_token2) != null)
             new AssertionError();
         if (NetworkHelper.GetOutgoingFriendRequests(access_token1) != null)
-            throw new AssertionError();
+            fail();
 
         // User 2 sends friend request to user 1
         NetworkHelper.AddFriend(username1, access_token2);
@@ -726,7 +726,7 @@ public class NetworkHelperUnitTest {
         ArrayList<ArrayList<String>> out = NetworkHelper
                 .GetOutgoingFriendRequests(access_token2);
         if (!out.get(0).get(0).toString().equals(username1))
-            throw new AssertionError();
+            fail();
     }
 
 
