@@ -254,28 +254,49 @@ public class NetworkHelperUnitTest {
         cb.waitDone();
     }
 
-/*
+
     // Checks that updating and getting the profile gives a correct output
     // Currently only works for getting description, not avatar url
     @Test
     public void GetProfileAfterUpdateTest() throws Exception {
 
-        // Register and login user first
-        String username = UUID.randomUUID().toString();
-        NetworkHelper.Register(username, test_password, test_avatar_url,
-                test_description);
-        String ACCESS_TOKEN = NetworkHelper.Login(username, test_password);
+        NewUser nu = newUser(null);
+
+        EmptyCallback cb = new EmptyCallback(null) {
+            @Override
+            public void onSuccess(Void object) {
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        };
 
         // The user updates its own profile
-        NetworkHelper.UpdateProfile(username, test_password,
-                test_avatar_url, test_description2, ACCESS_TOKEN);
+        NetworkHelper.UpdateProfile(nu.username, test_password,
+                test_avatar_url, test_description2, cb);
+
+        cb.waitDone();
+
+        NetworkCallback<Profile> cb2 = new NetworkCallback<Profile>(Profile.class, null) {
+            @Override
+            public void onSuccess(Profile profile) {
+                // Asserts that this update of teh profile was successful
+                assertEquals(profile.description, test_description2);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
 
         // The user gets its own profile description (that has recently been
         // updates
-        String response = NetworkHelper.GetProfile(username, ACCESS_TOKEN);
+        NetworkHelper.GetProfile(nu.username, cb2);
 
-        // Asserts that this update of teh profile was successful
-        assertEquals(response, test_description2);
     }
 
 
@@ -284,25 +305,33 @@ public class NetworkHelperUnitTest {
     public void GetAnotherUsersProfileTest() throws Exception {
 
         // Register and login user 1
-        String username1 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username1, test_password, test_avatar_url,
-                test_description1);
-        String access_token1 = NetworkHelper.Login(username1, test_password);
+        final NewUser nu1 = newUser(null);
 
         // Register user 2
-        String username2 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username2, test_password, test_avatar_url,
-                test_description2);
+        final NewUser nu2 = newUser(null);
+
+
+        NetworkCallback<Profile> cb = new NetworkCallback<Profile>(Profile.class, null) {
+            @Override
+            public void onSuccess(Profile profile) {
+                // Assert that the correct description attained was the correct
+                // description
+                assertEquals(profile.description, test_description);
+                assertEquals(profile.username, nu1.username);
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
 
         // User 1 tried to get the profile description of user 2
-        String response = NetworkHelper.GetProfile(username2, access_token1);
-
-        // Assert that the correct description attained was the correct
-        // description
-        assertEquals(response, test_description2);
+        NetworkHelper.GetProfile(nu1.username, cb);
     }
 
-
+/*
     // Tests that a user cannot update another users profile
     @Test
     public void UpdateAnotherUsersProfileTest() throws Exception {
