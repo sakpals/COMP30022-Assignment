@@ -89,8 +89,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void authSuccessful(String access_token) {
-        showProgress(false);
-
         Intent intent = new Intent(HomeActivity.this, MainActivity.class);
         intent.putExtra(MainActivity.ACCESS_TOKEN_INTENT_KEY, access_token);
         startActivity(intent);
