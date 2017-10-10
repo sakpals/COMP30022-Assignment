@@ -5,32 +5,54 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.app.LoaderManager.LoaderCallbacks;
+
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
+
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.Manifest.permission.READ_CONTACTS;
+
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
 
+    public static final String AT_PREFS = "AccessTokenPrefs";
+    public static final String AT_PREFS_KEY = "AccessTokenPrefs_KEY";
+
     // UI references.
-    private EditText mEmailView;
+    private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -38,9 +60,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+
+        checkLogin();
+
+        setContentView(R.layout.activity_home);
         // Set up the login form.
-        mEmailView = (EditText) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -65,7 +90,6 @@ public class LoginActivity extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -100,10 +124,6 @@ public class LoginActivity extends AppCompatActivity {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
         }
 
         if (cancel) {
@@ -119,12 +139,15 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isEmailValid(String email) {
-        return email.length() > 4;
+    private boolean isPasswordValid(String password) {
+        return password.length() >= 4;
     }
 
-    private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+    private void checkLogin() {
+        // TODO get stored access_token
+        SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
+        String access_token = settings.getString(AT_PREFS_KEY, "");
+        if(!access_token.equals("")) goToMainActivity(access_token);
     }
 
     /**
@@ -163,6 +186,14 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private void goToMainActivity(String access_token) {
+        // Send an intent to main activity with the user's access token
+        Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
+        startActivity(intent);
+        finish();
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -171,7 +202,7 @@ public class LoginActivity extends AppCompatActivity {
 
         private final String mEmail;
         private final String mPassword;
-        private String access_token = null;
+        private String access_token;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -180,18 +211,17 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
 
             access_token = NetworkHelper.Login(mEmail, mPassword);
 
-            // TODO: Make more general rejection for when server is down
+            if (access_token != null) return true;
 
-            if (!access_token.equals("500")) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            access_token = NetworkHelper.Register(mEmail, mPassword, "", "");
 
+            if (access_token != null) return true;
+
+            return false;
         }
 
         @Override
@@ -200,21 +230,11 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success) {
-                // Create Toast popup
-                Context context = getApplicationContext();
-                CharSequence text = "Registering was successful!";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-
-                // Send an intent to main activity with the user's access token
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-
-                intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
-                startActivity(intent);
+                SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
+                settings.edit().putString(AT_PREFS_KEY, access_token).commit();
+                goToMainActivity(access_token);
             } else {
-                mPasswordView.setError("Incorrect credentials");
+                mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
         }

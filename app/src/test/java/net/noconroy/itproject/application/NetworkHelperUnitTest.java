@@ -62,7 +62,7 @@ public class NetworkHelperUnitTest {
                 test_avatar_url, test_description);
 
         // Test if the server accepts this registering
-        if (!isAccepted(response))
+        if (response == null)
             throw new AssertionError(response);
     }
 
@@ -77,7 +77,7 @@ public class NetworkHelperUnitTest {
                 test_avatar_url, test_description);
 
         // Tests that the server accepts this registering
-        if (!isAccepted(response))
+        if (response == null)
             throw new AssertionError(response);
 
         // Tries to register the same username again
@@ -85,7 +85,7 @@ public class NetworkHelperUnitTest {
                 test_avatar_url, test_description);
 
         // Tests that the server does not accept duplicate username registering
-        if (isAccepted(response))
+        if (response != null)
             throw new AssertionError(response);
     }
 

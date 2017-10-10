@@ -102,8 +102,17 @@ public final class NetworkHelper {
 
         Call call = client.newCall(request);
         try {
+
             Response response = call.execute();
-            return Integer.toString(response.code());
+            String res = response.body().string();
+
+            if (!response.isSuccessful()) {
+                return null;
+            }
+
+            JsonObject token = new JsonParser().parse(res).getAsJsonObject();
+            return token.get(ACCESS_TOKEN_NAME).toString();
+
         } catch (IOException e) {
             e.printStackTrace();
             return e.getMessage();
@@ -145,13 +154,12 @@ public final class NetworkHelper {
             Response response = call.execute();
             String res = response.body().string();
 
-            if (response.code() != 200) {
-                return Integer.toString(response.code());
+            if (!response.isSuccessful()) {
+                return null;
             }
 
             JsonObject token = new JsonParser().parse(res).getAsJsonObject();
             return token.get(ACCESS_TOKEN_NAME).toString();
-
         } catch (IOException e) {
             e.printStackTrace();
             return e.getMessage();

@@ -33,7 +33,8 @@ public class AppLifecycleHandler implements Application.ActivityLifecycleCallbac
     @Override
     public void onActivityResumed(Activity activity) {
         ++resumed;
-        mainActivity.doBindLocationService();
+        if(mainActivity != null)
+            mainActivity.doBindLocationService();
     }
 
     @Override
