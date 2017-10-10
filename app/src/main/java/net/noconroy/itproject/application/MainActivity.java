@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
         ds = DataStorage.getInstance();
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
-        ds.setAccessToken(intent.getStringExtra(ACCESS_TOKEN_INTENT_KEY));
+        String token = intent.getStringExtra(ACCESS_TOKEN_INTENT_KEY);
+        if(token != null) ds.setAccessToken(token);
 
         // Set all location parameters
         mLocationServiceIntent = null;
