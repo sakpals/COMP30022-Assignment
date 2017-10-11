@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import net.noconroy.itproject.application.Chat.ChatActivity;
 import net.noconroy.itproject.application.callbacks.NetworkCallback;
 import net.noconroy.itproject.application.models.Friends;
 
@@ -78,7 +79,14 @@ public class FriendsActivity extends AppCompatActivity {
         NetworkHelper.GetFriends(new NetworkCallback<Friends>(Friends.class, this) {
             @Override
             public void onSuccess(Friends friends) {
-                mFriendsListAdapter = new FriendsListAdapter(friends, getApplicationContext(), FriendsActivity.this);
+                mFriendsListAdapter = new FriendsListAdapter(friends, getApplicationContext(), FriendsActivity.this, new FriendsListAdapter.OpenChat() {
+                    @Override
+                    public void user(String username) {
+                        Intent chatIntent = new Intent(FriendsActivity.this, ChatActivity.class);
+                        chatIntent.putExtra(ChatActivity.INTENT_NAME, username);
+                        startActivity(chatIntent);
+                    }
+                });
                 mFriendsList.setAdapter(mFriendsListAdapter);
             }
 
