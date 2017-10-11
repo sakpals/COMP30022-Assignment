@@ -11,7 +11,7 @@ public class Notifications {
     public ChatHelper chatHelper;
     public void initialise() {
         NetworkHelper.ChannelListen();
-
+        chatHelper = new ChatHelper();
     }
 
 

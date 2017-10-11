@@ -13,6 +13,7 @@ import net.noconroy.itproject.application.DataStorage;
 import net.noconroy.itproject.application.NetworkHelper;
 import net.noconroy.itproject.application.R;
 import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
 import net.noconroy.itproject.application.models.Message;
 
 import java.text.DateFormat;
@@ -28,6 +29,7 @@ import java.util.Date;
 public class ChatActivity extends AppCompatActivity {
 
     private ChatAdapter chatAdapter;
+    public static final String INTENT_NAME = "name";
 
     private Button sendButton;
     private EditText textInput;
@@ -36,10 +38,18 @@ public class ChatActivity extends AppCompatActivity {
     // Refers to the ID and NAME of the current user we're interacting with in the chat
     private String userClickedOnName;
 
+    Runnable updateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            chatAdapter.notifyDataSetChanged();
+        }
+    };
+
     NetworkHelper.Receiver receiver = new NetworkHelper.Receiver() {
         @Override
         public void process(Message message) {
             chatAdapter.Add(message);
+            ChatActivity.this.runOnUiThread(updateRunnable);
         }
     };
 
@@ -49,7 +59,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         // Retrieve information from extra bundle
-        userClickedOnName = getIntent().getExtras().getString("name");
+        userClickedOnName = getIntent().getExtras().getString(INTENT_NAME);
 
         setView();
 
@@ -86,7 +96,17 @@ public class ChatActivity extends AppCompatActivity {
 
 
                 textInput.setText("");
-                DataStorage.getInstance().notifications.chatHelper.sendMessage(userClickedOnName, inputtedText, null);
+                DataStorage.getInstance().notifications.chatHelper.sendMessage(userClickedOnName, inputtedText, new NetworkCallback<Message>(Message.class, null) {
+                    @Override
+                    public void onSuccess(Message object) {
+
+                    }
+
+                    @Override
+                    public void onFailure(Failure f) {
+
+                    }
+                });
             }
         });
     }

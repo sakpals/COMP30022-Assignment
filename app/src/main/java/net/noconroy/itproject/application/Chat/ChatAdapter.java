@@ -88,7 +88,6 @@ public class ChatAdapter extends BaseAdapter {
 
     public void Add(Message chatMessage) {
         chatMessages.add(chatMessage);
-        this.notifyDataSetChanged();
     }
 
     private ViewHolder createViewHolder(View v) {

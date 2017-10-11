@@ -16,6 +16,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import net.noconroy.itproject.application.AR.CompassActivity;
 import net.noconroy.itproject.application.AR.LocationService;
@@ -24,6 +25,7 @@ import net.noconroy.itproject.application.AR.LocationServiceProvider;
 import net.noconroy.itproject.application.Chat.ChatActivity;
 import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
 import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
 
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS;
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS_KEY;
@@ -108,11 +110,11 @@ public class MainActivity extends AppCompatActivity {
         settings.edit().remove(AT_PREFS_KEY).commit();
 
         stopLocationService();
-        NetworkHelper.Logout(new EmptyCallback(this) {
+        // TODO only logout on successful logout;
+        NetworkHelper.Logout(new EmptyCallback(null) {
             @Override
             public void onSuccess() {
-                startActivity(intent);
-                finish();
+
             }
 
             @Override
@@ -120,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        startActivity(intent);
+        finish();
     }
 
     public void camera(View view){

@@ -1,6 +1,7 @@
 package net.noconroy.itproject.application;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.noconroy.itproject.application.Chat.ChatActivity;
 import net.noconroy.itproject.application.callbacks.EmptyCallback;
 import net.noconroy.itproject.application.callbacks.NetworkCallback;
 import net.noconroy.itproject.application.models.Friends;
@@ -25,13 +27,20 @@ public class FriendsListAdapter extends BaseAdapter {
 
     private Context mContext;
     private Button mRemoveButton;
+    private Button mChatButton;
     private FriendsActivity mActivity;
+    private OpenChat openChat;
     Friends mFriends;
 
-    public FriendsListAdapter(Friends friends, Context context, FriendsActivity friendsActivity) {
+    public interface OpenChat {
+        public void user(String username);
+    }
+
+    public FriendsListAdapter(Friends friends, Context context, FriendsActivity friendsActivity, OpenChat _openChat) {
         mContext = context;
         mActivity = friendsActivity;
         mFriends = friends;
+        openChat = _openChat;
     }
 
     @Override
@@ -80,6 +89,14 @@ public class FriendsListAdapter extends BaseAdapter {
                         Toast.makeText(mActivity.getApplicationContext(), "Attempt to remove friend failed!", Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+        });
+
+        mChatButton = (Button) view.findViewById(R.id.ChatButton);
+        mChatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openChat.user(friend.username);
             }
         });
 
