@@ -1,5 +1,6 @@
 package net.noconroy.itproject.application;
 
+import net.noconroy.itproject.application.Chat.ChatHelper;
 import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
 import net.noconroy.itproject.application.callbacks.NetworkCallback;
 import net.noconroy.itproject.application.models.Profile;
@@ -10,12 +11,14 @@ import net.noconroy.itproject.application.models.Profile;
 
 public class DataStorage {
     private String access_token = null;
+    public Notifications notifications;
     public Profile me = null;
 
     private static DataStorage instance;
 
     private static DataStorage newInstance() {
         DataStorage i = new DataStorage();
+        i.notifications = new Notifications();
         return i;
     }
 
@@ -52,6 +55,7 @@ public class DataStorage {
             @Override
             public void onSuccess(Profile profile) {
                 me = profile;
+                notifications.initialise();
             }
 
             @Override

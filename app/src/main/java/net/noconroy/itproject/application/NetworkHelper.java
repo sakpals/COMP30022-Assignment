@@ -5,6 +5,8 @@ package net.noconroy.itproject.application;
  * interact with the client
  */
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -483,7 +485,7 @@ public final class NetworkHelper {
         call.enqueue(cb);
     }
 
-    public class Messages { List<Message> messages; };
+    public class Messages { public List<Message> messages; };
 
     public static void ChannelMessages(String name, NetworkCallback<Messages> cb) {
         HttpUrl url = constructURL(CHANNEL + name + MESSAGE);
@@ -496,7 +498,7 @@ public final class NetworkHelper {
         call.enqueue(cb);
     }
 
-    public static void ChannelMessage(String name, String type, JsonObject message, EmptyCallback cb) {
+    public static void ChannelMessage(String name, String type, JsonObject message, NetworkCallback<Message> cb) {
 
         HttpUrl url = constructURL(CHANNEL + name + MESSAGE);
 
@@ -576,6 +578,10 @@ public final class NetworkHelper {
 
     public static void ChannelAddListener(String type, Receiver listener) {
         listeners.put(type, listener);
+    }
+
+    public static void ChannelRemoveListener(String type) {
+        listeners.remove(type);
     }
 
     /************************************************************************/

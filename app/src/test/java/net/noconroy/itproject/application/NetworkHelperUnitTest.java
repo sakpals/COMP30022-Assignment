@@ -399,9 +399,9 @@ public class NetworkHelperUnitTest {
         });
 
         // Send messages
-        EmptyCallback messageCallback = new EmptyCallback(null) {
+        NetworkCallback<Message> messageCallback = new NetworkCallback<Message>(Message.class, null) {
             @Override
-            public void onSuccess() {
+            public void onSuccess(Message m) {
 
             }
 
