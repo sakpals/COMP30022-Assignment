@@ -2,6 +2,7 @@ package net.noconroy.itproject.application.Chat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +61,7 @@ public class ChatAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder)view.getTag();
         }
+        Log.i("chatMessage", chatMessage.data.toString());
 
         setMessagePositioning(holder, chatMessage.isMe());
         holder.message.setText(ChatHelper.getText(chatMessage));

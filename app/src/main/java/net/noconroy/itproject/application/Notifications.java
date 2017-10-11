@@ -13,6 +13,4 @@ public class Notifications {
         NetworkHelper.ChannelListen();
         chatHelper = new ChatHelper();
     }
-
-
 }

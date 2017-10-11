@@ -64,10 +64,11 @@ public class ChatActivity extends AppCompatActivity {
         setView();
 
         // Create a new chat adapter and backlog and load history
-        DataStorage.getInstance().notifications.chatHelper.addReceiver(receiver);
         chatAdapter = new ChatAdapter(this);
         messageList.setAdapter(chatAdapter);
 
+        DataStorage.getInstance().notifications.chatHelper.addReceiver(receiver);
+        DataStorage.getInstance().notifications.chatHelper.loadUserMessages(userClickedOnName, DataStorage.getInstance().me.username);
     }
 
     @Override

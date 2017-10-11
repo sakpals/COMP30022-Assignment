@@ -1,6 +1,7 @@
 package net.noconroy.itproject.application.Chat;
 
 import android.app.Activity;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -103,12 +104,13 @@ public final class ChatHelper {
         NetworkHelper.ChannelListen();
     }
 
-    public void loadChannelMessages(String name) {
-        NetworkHelper.ChannelMessages(name, new NetworkCallback<NetworkHelper.Messages>(NetworkHelper.Messages.class, null) {
+    public void loadUserMessages(String friend, String name) {
+        NetworkCallback<NetworkHelper.Messages> cb = new NetworkCallback<NetworkHelper.Messages>(NetworkHelper.Messages.class, null) {
             @Override
             public void onSuccess(NetworkHelper.Messages object) {
                 for (Message m: object.messages) {
-                    AddMessage(m);
+                    if(m.type.equals(CHAT_MESSAGE_TYPE))
+                        AddMessage(m);
                 }
             }
 
@@ -116,7 +118,10 @@ public final class ChatHelper {
             public void onFailure(Failure f) {
 
             }
-        });
+        };
+
+        NetworkHelper.ChannelMessages("user_"+name, cb);
+        NetworkHelper.ChannelMessages("user_"+friend, cb);
     }
 
     public void stop() {
