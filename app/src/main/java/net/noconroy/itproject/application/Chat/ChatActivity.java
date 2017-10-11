@@ -1,6 +1,7 @@
 package net.noconroy.itproject.application.Chat;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -8,7 +9,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import net.noconroy.itproject.application.DataStorage;
+import net.noconroy.itproject.application.NetworkHelper;
 import net.noconroy.itproject.application.R;
+import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.models.Message;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -23,15 +28,20 @@ import java.util.Date;
 public class ChatActivity extends AppCompatActivity {
 
     private ChatAdapter chatAdapter;
-    private ArrayList<ChatMessage> chatMessages;
 
     private Button sendButton;
     private EditText textInput;
     private ListView messageList;
 
     // Refers to the ID and NAME of the current user we're interacting with in the chat
-    private String userClickedOnId;
     private String userClickedOnName;
+
+    NetworkHelper.Receiver receiver = new NetworkHelper.Receiver() {
+        @Override
+        public void process(Message message) {
+            chatAdapter.Add(message);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +50,12 @@ public class ChatActivity extends AppCompatActivity {
 
         // Retrieve information from extra bundle
         userClickedOnName = getIntent().getExtras().getString("name");
-        userClickedOnId = getIntent().getExtras().getString("id");
 
         setView();
 
         // Create a new chat adapter and backlog and load history
-        chatMessages = new ArrayList<ChatMessage>();
-        loadServerHistory(chatMessages);
-        chatAdapter = new ChatAdapter(ChatActivity.this, chatMessages);
+        DataStorage.getInstance().notifications.chatHelper.addReceiver(receiver);
+        chatAdapter = new ChatAdapter(this);
         messageList.setAdapter(chatAdapter);
 
     }
@@ -76,48 +84,11 @@ public class ChatActivity extends AppCompatActivity {
                     return;
                 }
 
-                ChatMessage message = new ChatMessage(
-                        "userId",       // a unique id for this chat message
-                        textInput.getText().toString(),
-                        DateFormat.getDateTimeInstance().format(new Date()),
-                        true
-                );
 
-                // Remove whatever we had in our edit text box
                 textInput.setText("");
-                sendMessage(message);
-                dummyData();
+                DataStorage.getInstance().notifications.chatHelper.sendMessage(userClickedOnName, inputtedText, null);
             }
         });
-    }
-
-    // Would make a request to server to get all previous messages sent between the two users
-    private void loadServerHistory(ArrayList<ChatMessage> chatMessages) {
-        ;
-    }
-
-    private void sendMessage(ChatMessage message) {
-        chatAdapter.add(message);
-        chatAdapter.notifyDataSetChanged();
-        scrollListView();
-    }
-
-    private void dummyData() {
-        ChatMessage m1 = new ChatMessage(
-                "2",
-                "Hello darkness my old friend",
-                DateFormat.getDateTimeInstance().format(new Date()),
-                false
-        );
-        ChatMessage m2 = new ChatMessage(
-                "2",
-                "are you well?",
-                DateFormat.getDateTimeInstance().format(new Date()),
-                false
-        );
-
-        sendMessage(m1);
-        sendMessage(m2);
     }
 
     private void scrollListView() {

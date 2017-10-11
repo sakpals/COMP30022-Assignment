@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.noconroy.itproject.application.R;
+import net.noconroy.itproject.application.models.Message;
 
 import java.util.ArrayList;
 
@@ -23,28 +24,22 @@ import java.util.ArrayList;
 
 public class ChatAdapter extends BaseAdapter {
 
-    private ArrayList<ChatMessage> chatMessages = null;
-    private Activity activity = null;
+    private ArrayList<Message> chatMessages;
+    private Activity activity;
 
-    public ChatAdapter(Activity activity, ArrayList<ChatMessage> chatMessages) {
-        this.chatMessages = chatMessages;
-        this.activity = activity;
+    public ChatAdapter(Activity _activity) {
+        activity = _activity;
+        chatMessages = new ArrayList<>();
     }
 
     @Override
     public int getCount() {
-        if (chatMessages != null) {
-            return chatMessages.size();
-        }
-        return 0;
+        return chatMessages.size();
     }
 
     @Override
-    public ChatMessage getItem(int i) {
-        if (chatMessages != null) {
-            return chatMessages.get(i);
-        }
-        return null;
+    public Message getItem(int i) {
+        return chatMessages.get(i);
     }
 
     @Override
@@ -55,7 +50,7 @@ public class ChatAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder;
-        ChatMessage chatMessage = getItem(i);
+        Message chatMessage = getItem(i);
         LayoutInflater vi = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (view == null) {
@@ -67,8 +62,8 @@ public class ChatAdapter extends BaseAdapter {
         }
 
         setMessagePositioning(holder, chatMessage.isMe());
-        holder.message.setText(chatMessage.getMessage());
-        holder.date.setText(chatMessage.getMessageDate());
+        holder.message.setText(ChatHelper.getText(chatMessage));
+        holder.date.setText(chatMessage.server_time);
 
         return view;
     }
@@ -91,12 +86,9 @@ public class ChatAdapter extends BaseAdapter {
         }
     }
 
-    public void add(ChatMessage chatMessage) {
+    public void Add(Message chatMessage) {
         chatMessages.add(chatMessage);
-    }
-
-    public void addAll(ArrayList<ChatMessage> chatMessages) {
-        this.chatMessages = chatMessages;
+        this.notifyDataSetChanged();
     }
 
     private ViewHolder createViewHolder(View v) {
