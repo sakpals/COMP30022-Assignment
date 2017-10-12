@@ -189,17 +189,18 @@ public class LocationService extends Service {
                     Date currentDate = new Date();
                     extendedLocationTimer -= ((currentDate.getTime() - clickedLastUpdateTime.getTime()) / 1000);
                     clickedLastUpdateTime = currentDate;
-                }
-
-                // The application is in the background -- However if there is a timer being implemented then keep updating
-                if (!AppLifecycleHandler.isApplicationInForeground() && !AppLifecycleHandler.isApplicationVisible()
-                        && extendedLocationTimer <= 0) {
-                    currentActivity.stopLocationService();
-                }
-
-                // The application is still visible or useable by the user
-                else {
                     updateLocation();
+                }
+
+                else {
+                    // The application is in the background and there is no timer active extending the location updates
+                    if (!AppLifecycleHandler.isApplicationInForeground() && !AppLifecycleHandler.isApplicationVisible()) {
+                        currentActivity.stopLocationService();
+                    }
+                    // The application is in the foreground -- keep updating
+                    else {
+                        updateLocation();
+                    }
                 }
             }
         };
@@ -276,22 +277,28 @@ public class LocationService extends Service {
             return;
         }
 
-        Log.i(TAG, "Location has been updated.");
-
-        NetworkHelper.UpdateLocation(ds.me.username,
-                mCurrentLocation.getLatitude(),
-                mCurrentLocation.getLongitude(), new EmptyCallback(null){
-
+        if (ds.me != null) {
+            if (currentActivity.sharingLocation) {
+                Log.i(TAG, "Location sharing is enabled, location will be updated.");
+                NetworkHelper.UpdateLocation(ds.me.username,
+                        mCurrentLocation.getLatitude(),
+                        mCurrentLocation.getLongitude(), new EmptyCallback(null){
+                            @Override
+                            public void onSuccess() {}
+                            @Override
+                            public void onFailure(Failure f) {}
+                        });
+            }
+            else {
+                Log.i(TAG, "Location sharing is disabled, location will not be updated");
+                NetworkHelper.ResetLocation(ds.me.username, new EmptyCallback(null) {
                     @Override
-                    public void onSuccess() {
-
-                    }
-
+                    public void onSuccess() {}
                     @Override
-                    public void onFailure(Failure f) {
-
-                    }
+                    public void onFailure(Failure f) {}
                 });
+            }
+        }
     }
 
 

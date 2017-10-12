@@ -16,20 +16,18 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import net.noconroy.itproject.application.AR.CompassActivity;
 import net.noconroy.itproject.application.AR.LocationService;
 import net.noconroy.itproject.application.AR.LocationServiceProvider;
-import net.noconroy.itproject.application.Chat.ChatActivity;
-import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
 import net.noconroy.itproject.application.callbacks.EmptyCallback;
-import net.noconroy.itproject.application.callbacks.NetworkCallback;
 
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS;
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS_KEY;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String ACCESS_TOKEN_INTENT_KEY = "access_token_intent_key";
@@ -39,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     /***************************************************************************************/
     /********************************** Location Variables *********************************/
     /***************************************************************************************/
+
+    public boolean sharingLocation = false;
 
     private Intent mLocationServiceIntent;
     private LocationService mLocationService;
@@ -67,12 +67,14 @@ public class MainActivity extends AppCompatActivity {
         mLocationService = null;
         locationServiceBound = false;
 
+        // Set switch parameters
+        addOnSwitchListener();
+
         // Bind this activity to the location service, register it and start it
         createLocationServices();
 
         // Set this main activity as the main activity of our app lifecycle handler
         AppLifecycleHandler.setMainActivity(this);
-
     }
 
     @Override
@@ -113,28 +115,24 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    public void camera(View view){
-        Intent intent = new Intent(this, CameraActivity.class);
-        startActivity(intent);
+    private void addOnSwitchListener() {
+        Switch locationSharing = (Switch)findViewById(R.id.LocationShare);
+        locationSharing.setOnCheckedChangeListener(this);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            sharingLocation = true;
+        } else {
+            sharingLocation = false;
+        }
     }
 
     public void friends(View view) {
         Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
         startActivity(intent);
     }
-
-    public void startChat(View view) {
-        Intent intent = new Intent(this, ChatActivity.class);
-
-        // Change this in order to add the users id and name from server
-        Bundle userClickedOn = new Bundle();
-        userClickedOn.putString("id", "1");         // replace with proper id
-        userClickedOn.putString("name", "bob");     // replace with proper name etc.
-        intent.putExtras(userClickedOn);
-
-        startActivity(intent);
-    }
-
 
     public void doBindLocationService() {
         if (mLocationService != null) {
@@ -290,6 +288,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
 }
