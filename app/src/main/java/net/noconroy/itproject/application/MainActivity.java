@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     /********************************** Location Variables *********************************/
     /***************************************************************************************/
 
-    public boolean sharingLocation = false;
-
     private Intent mLocationServiceIntent;
     private LocationService mLocationService;
     private boolean locationServiceBound;
@@ -123,12 +121,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
-            sharingLocation = true;
             LocationServiceProvider.sharingLocation = true;
         }
 
         else {
-            LocationServiceProvider.sharingLocation = true;
+            LocationServiceProvider.sharingLocation = false;
             Log.i(TAG, "Location sharing is disabled, location will not be updated");
 
             NetworkHelper.ResetLocation(ds.me.username, new EmptyCallback(null) {
@@ -137,6 +134,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 @Override
                 public void onFailure(Failure f) {}
             });
+        }
+    }
+
+    public void extendLocationService(View view) {
+        if (LocationServiceProvider.sharingLocation) {
+            Log.i(TAG, "Extending location services for 10 minutes!");
+            LocationServiceProvider.extendLocationUpdates(10);
         }
     }
 

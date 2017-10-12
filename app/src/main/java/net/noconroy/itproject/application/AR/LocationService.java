@@ -309,6 +309,7 @@ public class LocationService extends Service {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
 
         Log.i(TAG, "Resetting users location when they close the application -- or location services");
+        LocationServiceProvider.sharingLocation = false;
         NetworkHelper.ResetLocation(ds.me.username, new EmptyCallback(null) {
             @Override
             public void onSuccess() {}
