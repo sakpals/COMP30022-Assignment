@@ -8,4 +8,5 @@ public class Profile {
     public String username;
     public String description;
     public String avatar_url;
+    public Orientation orientation;
 }

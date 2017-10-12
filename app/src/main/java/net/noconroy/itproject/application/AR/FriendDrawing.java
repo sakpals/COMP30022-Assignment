@@ -8,13 +8,10 @@ import android.graphics.Bitmap;
 
 public class FriendDrawing {
 
-    private double lat;
-    private double long_;
     private String id;
     private String name;
     private Bitmap userImage;
-
-    private double rotationFromNorth;       // Will be used by CompassManager to render the position of our friend
+    private double rotationFromNorth;
 
     public FriendDrawing() {
         ;
@@ -23,21 +20,7 @@ public class FriendDrawing {
     public double getRotationFromNorth() {
         return rotationFromNorth;
     }
-    public void setRotationFromNorth(double rotationFromNorth) {
-        this.rotationFromNorth = rotationFromNorth;
-    }
-    public double getLat() {
-        return lat;
-    }
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-    public double getLong_() {
-        return long_;
-    }
-    public void setLong_(double long_) {
-        this.long_ = long_;
-    }
+    public void setRotationFromNorth(double rotationFromNorth) { this.rotationFromNorth = rotationFromNorth; }
     public String getId() {
         return id;
     }
