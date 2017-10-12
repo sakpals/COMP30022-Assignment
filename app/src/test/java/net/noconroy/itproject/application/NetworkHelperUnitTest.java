@@ -10,14 +10,27 @@ package net.noconroy.itproject.application;
  * accecting the tested method.
  */
 
+import android.util.Log;
+
+import com.google.gson.JsonObject;
+
+import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
+import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
+import net.noconroy.itproject.application.models.Message;
+import net.noconroy.itproject.application.models.Profile;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import okhttp3.Call;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 public class NetworkHelperUnitTest {
@@ -51,19 +64,37 @@ public class NetworkHelperUnitTest {
             "likey offline, please try again later";
 
 
+    private class NewUser{public String username; public String access_token;};
+    private NewUser newUser(String username) {
+        final NewUser u = new NewUser();
+
+        u.username = username == null ? UUID.randomUUID().toString() : username;
+
+        AuthenticationCallback cb = new AuthenticationCallback(null) {
+            @Override
+            public void onAuthenticated(String access_token) {
+                u.access_token = access_token;
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        };
+
+        NetworkHelper.Register(u.username, test_password, test_avatar_url, test_description, cb);
+
+        cb.waitDone();
+
+        return u;
+    }
 
     // Basic Register test to test if server accepts registering
     @Test
     public void RegisterTest() throws Exception {
 
-        // Register user
-        String username = UUID.randomUUID().toString();
-        String response = NetworkHelper.Register(username, test_password,
-                test_avatar_url, test_description);
+        newUser(null);
 
-        // Test if the server accepts this registering
-        if (response == null)
-            throw new AssertionError(response);
     }
 
 
@@ -71,22 +102,11 @@ public class NetworkHelperUnitTest {
     @Test
     public void RegisterTwiceTest() throws Exception {
 
-        // Registers a user
-        String username = UUID.randomUUID().toString();
-        String response = NetworkHelper.Register(username, test_password,
-                test_avatar_url, test_description);
+        NewUser nu = newUser(null);
 
-        // Tests that the server accepts this registering
-        if (response == null)
-            throw new AssertionError(response);
+        NewUser failed = newUser(nu.username);
 
-        // Tries to register the same username again
-        response = NetworkHelper.Register(username, test_password,
-                test_avatar_url, test_description);
-
-        // Tests that the server does not accept duplicate username registering
-        if (response != null)
-            throw new AssertionError(response);
+        if(failed.access_token != null) fail("Server allowed duplicate rego");
     }
 
 
@@ -94,20 +114,31 @@ public class NetworkHelperUnitTest {
     @Test
     public void LoginTest() throws Exception {
 
-        // Register and login a user
-        String username = UUID.randomUUID().toString();
-        NetworkHelper.Register(username, test_password, test_avatar_url, test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        NewUser nu = newUser(null);
 
-        // Checks for whitespaces in access_token, which usually occers if the
-        // server is offline
-        if (access_token.matches(".*\\s+.*"))
-            throw new AssertionError(server_offline_error);
+        AuthenticationCallback cb = new AuthenticationCallback(null) {
+            @Override
+            public void onAuthenticated(String access_token) {
+                // Checks for whitespaces in ACCESS_TOKEN, which usually occers if the
+                // server is offline
+                if (access_token.matches(".*\\s+.*"))
+                    fail(server_offline_error);
 
-        // Indicates the server has responded with a HTTP error, and not a
-        // username
-        if (!access_token.matches(".*[a-z].*"))
-            throw new AssertionError(access_token);
+                // Indicates the server has responded with a HTTP error, and not a
+                // username
+                if (!access_token.matches(".*[a-z].*"))
+                    fail(access_token);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        };
+
+        NetworkHelper.Login(nu.username, test_password, cb);
+
+        cb.waitDone();
     }
 
 
@@ -116,17 +147,24 @@ public class NetworkHelperUnitTest {
     @Test
     public void LogoutTest() throws Exception {
 
-        // Register and login a user
-        String username = UUID.randomUUID().toString();
-        NetworkHelper.Register(username, test_password, test_avatar_url, test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        NewUser nu = newUser(null);
+
+        EmptyCallback cb = new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
 
         // Logout the user
-        String response = NetworkHelper.Logout(access_token);
+        NetworkHelper.Logout(cb);
 
-        // Tests that the server accepted this logout
-        if (!isAccepted(response))
-            throw new AssertionError(response);
+        cb.waitDone();
     }
 
 
@@ -134,21 +172,38 @@ public class NetworkHelperUnitTest {
     @Test
     public void InvalidLogoutTest() throws Exception {
 
-        // Register and login a user
-        String username = UUID.randomUUID().toString();
-        NetworkHelper.Register(username, test_password, test_avatar_url, test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        final NewUser nu = newUser(null);
+
+        final EmptyCallback second = new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
+                fail("Succeeded logging out twice");
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        };
+
+        EmptyCallback first = new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
+                // Log out second time
+                NetworkHelper.Logout(second);
+                second.waitDone();
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
 
         // Logout for the first time
-        String response = NetworkHelper.Logout(access_token);
-        if (!isAccepted(response)) throw new AssertionError(response);
+        NetworkHelper.Logout(first);
 
-        // Logout for a second time, and get the servers response to this
-        response = NetworkHelper.Logout(access_token);
-
-        // Checks if logout works whilst already logged out
-        // Will return error if logout works as planned
-        if (isAccepted(response)) throw new AssertionError(response);
+        first.waitDone();
     }
 
 
@@ -156,20 +211,26 @@ public class NetworkHelperUnitTest {
     @Test
     public void UpdateProfileTest() throws Exception {
 
-        // Register and login a user
-        String username = UUID.randomUUID().toString();
-        NetworkHelper.Register(username, test_password, test_avatar_url,
-                test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        NewUser nu = newUser(null);
+
+        EmptyCallback cb = new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
 
         // Get the server's response to updating a profile
-        String response = NetworkHelper.UpdateProfile(username, test_password,
-                test_avatar_url, test_description, access_token);
+        NetworkHelper.UpdateProfile(nu.username, test_password,
+                test_avatar_url, test_description, cb);
 
-        // Checks that the servers response indicates that it accepted this
-        // request
-        if (!isAccepted(response))
-            throw new AssertionError(response);
+        cb.waitDone();
+
     }
 
 
@@ -177,17 +238,24 @@ public class NetworkHelperUnitTest {
     @Test
     public void GetProfileBasicTest() throws Exception {
 
-        // Register and login user
-        String username = UUID.randomUUID().toString();
-        NetworkHelper.Register(username, test_password, test_avatar_url,
-                test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        NewUser nu = newUser(null);
 
-        // Get the profile of the user
-        String response = NetworkHelper.GetProfile(username, access_token);
+        NetworkCallback<Profile> cb = new NetworkCallback<Profile>(Profile.class, null){
 
-        // Checks that this profile is the correct profile
-        assertEquals(response, test_description);
+            @Override
+            public void onSuccess(Profile p) {
+                assertEquals(p.description, test_description);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                assert(false);
+            }
+        };
+
+        NetworkHelper.GetProfile(null, cb);
+
+        cb.waitDone();
     }
 
 
@@ -196,22 +264,43 @@ public class NetworkHelperUnitTest {
     @Test
     public void GetProfileAfterUpdateTest() throws Exception {
 
-        // Register and login user first
-        String username = UUID.randomUUID().toString();
-        NetworkHelper.Register(username, test_password, test_avatar_url,
-                test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        NewUser nu = newUser(null);
+
+        EmptyCallback cb = new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        };
 
         // The user updates its own profile
-        NetworkHelper.UpdateProfile(username, test_password,
-                test_avatar_url, test_description2, access_token);
+        NetworkHelper.UpdateProfile(nu.username, test_password,
+                test_avatar_url, test_description2, cb);
+
+        cb.waitDone();
+
+        NetworkCallback<Profile> cb2 = new NetworkCallback<Profile>(Profile.class, null) {
+            @Override
+            public void onSuccess(Profile profile) {
+                // Asserts that this update of teh profile was successful
+                assertEquals(profile.description, test_description2);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
 
         // The user gets its own profile description (that has recently been
         // updates
-        String response = NetworkHelper.GetProfile(username, access_token);
+        NetworkHelper.GetProfile(nu.username, cb2);
 
-        // Asserts that this update of teh profile was successful
-        assertEquals(response, test_description2);
     }
 
 
@@ -220,22 +309,29 @@ public class NetworkHelperUnitTest {
     public void GetAnotherUsersProfileTest() throws Exception {
 
         // Register and login user 1
-        String username1 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username1, test_password, test_avatar_url,
-                test_description1);
-        String access_token1 = NetworkHelper.Login(username1, test_password);
+        final NewUser nu1 = newUser(null);
 
         // Register user 2
-        String username2 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username2, test_password, test_avatar_url,
-                test_description2);
+        final NewUser nu2 = newUser(null);
 
-        // User 1 tried to get the profile description of user 2
-        String response = NetworkHelper.GetProfile(username2, access_token1);
 
-        // Assert that the correct description attained was the correct
-        // description
-        assertEquals(response, test_description2);
+        NetworkCallback<Profile> cb = new NetworkCallback<Profile>(Profile.class, null) {
+            @Override
+            public void onSuccess(Profile profile) {
+                // Assert that the correct description attained was the correct
+                // description
+                assertEquals(profile.description, test_description);
+                assertEquals(profile.username, nu1.username);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
+
+        // User 2 tried to get the profile description of user 1
+        NetworkHelper.GetProfile(nu1.username, cb);
     }
 
 
@@ -244,26 +340,105 @@ public class NetworkHelperUnitTest {
     public void UpdateAnotherUsersProfileTest() throws Exception {
 
         // Register and login user 1
-        String username1 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username1, test_password, test_avatar_url,
-                test_description1);
-        String access_token1 = NetworkHelper.Login(username1, test_password);
+        final NewUser nu1 = newUser(null);
 
-        // Register and login user 2
-        String username2 = UUID.randomUUID().toString();
-        NetworkHelper.Register(username2, test_password, test_avatar_url,
-                test_description2);
-        String access_token2 = NetworkHelper.Login(username2, test_password);
+        // Register user 2
+        final NewUser nu2 = newUser(null);
 
-        // User 2 tries to update user 1's profile
-        String response = NetworkHelper.UpdateProfile(username1,
-                wrong_password, test_avatar_url, test_description2, access_token2);
 
-        // Throw error if the server accepts this
-        if (isAccepted(response)) throw new AssertionError(response);
+        EmptyCallback cb = new EmptyCallback(null) {
+
+            @Override
+            public void onSuccess() {
+                fail("User updated anothers profile!");
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        };
+
+        // User 2 tried to get the profile description of user 1
+        NetworkHelper.UpdateProfile(nu1.username, wrong_password, test_avatar_url, test_description3, cb);
     }
 
+    // Tests channel creation deletion
+    @Test
+    public void ChannelThorough() throws Exception {
 
+        String channel = UUID.randomUUID().toString();
+        final NewUser nu = newUser(null);
+
+        Thread.sleep(5000);
+
+        // Create channel
+        EmptyCallback createCallback = new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
+
+        NetworkHelper.ChannelCreate(channel, true, createCallback);
+        createCallback.waitDone();
+
+        // Start channel listeners
+        NetworkHelper.ChannelListen();
+
+        NetworkHelper.ChannelAddListener("m.test", new NetworkHelper.Receiver() {
+            @Override
+            public void process(Message message) {
+                System.out.println("Received message: " + message);
+            }
+        });
+
+        // Send messages
+        NetworkCallback<Message> messageCallback = new NetworkCallback<Message>(Message.class, null) {
+            @Override
+            public void onSuccess(Message m) {
+
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
+
+        JsonObject msg = new JsonObject();
+        msg.addProperty("text", "My sample text");
+
+        int i = 0;
+        while(i < 10) {
+            NetworkHelper.ChannelMessage(channel, "m.test", msg, messageCallback);
+            Thread.sleep(1000);
+            i++;
+        }
+
+        // Get all messages for channel
+        NetworkCallback<NetworkHelper.Messages> getCallback = new NetworkCallback<NetworkHelper.Messages>(NetworkHelper.Messages.class, null) {
+            @Override
+            public void onSuccess(NetworkHelper.Messages o) {
+                assertEquals(o.messages.size(), 10);
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+                fail(f.toString());
+            }
+        };
+
+        NetworkHelper.ChannelMessages(channel, getCallback);
+        getCallback.waitDone();
+    }
+
+/*
     // Tests that the server accepts request to update users own location
     @Test
     public void UpdateLocationTest() throws Exception {
@@ -272,15 +447,15 @@ public class NetworkHelperUnitTest {
         String username = UUID.randomUUID().toString();
         NetworkHelper.Register(username, test_password, test_avatar_url,
                 test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        String ACCESS_TOKEN = NetworkHelper.Login(username, test_password);
 
         // The user updates its own location
         String response = NetworkHelper.UpdateLocation(username, test_lat, test_lon,
-                access_token);
+                ACCESS_TOKEN);
 
         // Throws exception if the server doesn't accept this location update
         if (!isAccepted(response))
-            throw new AssertionError(response);
+            fail(response);
     }
 
 
@@ -292,34 +467,34 @@ public class NetworkHelperUnitTest {
         String username = UUID.randomUUID().toString();
         NetworkHelper.Register(username, test_password, test_avatar_url,
                 test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        String ACCESS_TOKEN = NetworkHelper.Login(username, test_password);
 
         // TODO: iterate through all illegal characters which will be contained in a constant array
 
         String response = NetworkHelper.UpdateLocation(username, "??", "15",
-                access_token);
+                ACCESS_TOKEN);
         if (isAccepted(response))
-            throw new AssertionError(response);
+            fail(response);
 
         response = NetworkHelper.UpdateLocation(username, "sdad", "15",
-                access_token);
-        if (!response.equals("400")) throw new AssertionError(response);
+                ACCESS_TOKEN);
+        if (!response.equals("400")) fail(response);
 
         response = NetworkHelper.UpdateLocation(username, "10", "??",
-                access_token);
-        if (!response.equals("400")) throw new AssertionError(response);
+                ACCESS_TOKEN);
+        if (!response.equals("400")) fail(response);
 
         response = NetworkHelper.UpdateLocation(username, "10", "sdad",
-                access_token);
-        if (!response.equals("400")) throw new AssertionError(response);
+                ACCESS_TOKEN);
+        if (!response.equals("400")) fail(response);
 
         response = NetworkHelper.UpdateLocation(username, " ", "sdad",
-                access_token);
-        if (!response.equals("400")) throw new AssertionError(response);
+                ACCESS_TOKEN);
+        if (!response.equals("400")) fail(response);
 
         response = NetworkHelper.UpdateLocation(username, "10", " ",
-                access_token);
-        if (!response.equals("400")) throw new AssertionError(response);
+                ACCESS_TOKEN);
+        if (!response.equals("400")) fail(response);
     }
 
 
@@ -333,17 +508,17 @@ public class NetworkHelperUnitTest {
         String username = UUID.randomUUID().toString();
         NetworkHelper.Register(username, test_password, test_avatar_url,
                 test_description);
-        String access_token = NetworkHelper.Login(username, test_password);
+        String ACCESS_TOKEN = NetworkHelper.Login(username, test_password);
 
         // Updates the users own location
         String response = NetworkHelper.UpdateLocation(username, test_lat, test_lon,
-                access_token);
+                ACCESS_TOKEN);
 
         // Tests that the location correctly updates to the defult values
-        if (!NetworkHelper.RetrieveLocation(username, access_token)[0].equals(default_lat))
-            throw new AssertionError(response);
-        if (!NetworkHelper.RetrieveLocation(username, access_token)[1].equals(default_lon))
-            throw new AssertionError(response);
+        if (!NetworkHelper.RetrieveLocation(username, ACCESS_TOKEN)[0].equals(default_lat))
+            fail(response);
+        if (!NetworkHelper.RetrieveLocation(username, ACCESS_TOKEN)[1].equals(default_lon))
+            fail(response);
     }
 
 
@@ -370,7 +545,7 @@ public class NetworkHelperUnitTest {
         // server allows this to occur
         String response = NetworkHelper.UpdateLocation(username1, test_lat2, test_lon2,
                 access_token2);
-        if (isAccepted(response)) throw new AssertionError(response);
+        if (isAccepted(response)) fail(response);
 
     }
 
@@ -392,7 +567,7 @@ public class NetworkHelperUnitTest {
         String response = NetworkHelper.AddFriend(username1, access_token2);
 
         // Checks that the server accepted this request
-        if (!isAccepted(response)) throw new AssertionError(response);
+        if (!isAccepted(response)) fail(response);
     }
 
 
@@ -420,7 +595,7 @@ public class NetworkHelperUnitTest {
         String response = NetworkHelper.AddFriend(username1, access_token2);
 
         // Checks that the server doesn't accept the second friend request
-        if (isAccepted(response)) throw new AssertionError(response);
+        if (isAccepted(response)) fail(response);
     }
 
 
@@ -453,12 +628,12 @@ public class NetworkHelperUnitTest {
         // Checks that user 1 now has user 2 as a friend
         if (!NetworkHelper.GetFriends(access_token1).get(0).get(0)
             .equals(username2))
-            throw new AssertionError();
+            fail();
 
         // Checks that user 2 now has user 1 as a friend
         if (!NetworkHelper.GetFriends(access_token1).get(0).get(0)
                 .equals(username2))
-            throw new AssertionError();
+            fail();
     }
 
 
@@ -494,7 +669,7 @@ public class NetworkHelperUnitTest {
 
         // Checks that the server rejects user 2 accepting friend request,
         // as only the target user should be able to accept the friend request
-        if (isAccepted(response)) throw new AssertionError(response);
+        if (isAccepted(response)) fail(response);
     }
 
 
@@ -549,11 +724,11 @@ public class NetworkHelperUnitTest {
         // User 1 gets gets a list of his friends and des
         ArrayList<ArrayList<String>> out = NetworkHelper.GetFriends(access_token1);
 
-        if (out.size() != 2) throw new AssertionError();
-        if (!out.get(0).get(0).equals(username2)) throw new AssertionError();
-        if (!out.get(0).get(1).equals(test_description2)) throw new AssertionError();
-        if (!out.get(1).get(0).equals(username3)) throw new AssertionError();
-        if (!out.get(1).get(1).equals(test_description3)) throw new AssertionError();
+        if (out.size() != 2) fail();
+        if (!out.get(0).get(0).equals(username2)) fail();
+        if (!out.get(0).get(1).equals(test_description2)) fail();
+        if (!out.get(1).get(0).equals(username3)) fail();
+        if (!out.get(1).get(1).equals(test_description3)) fail();
     }
 
 
@@ -592,9 +767,9 @@ public class NetworkHelperUnitTest {
 
         // Check that both users now have no friends
         if (NetworkHelper.GetFriends(access_token1).size() != 0)
-            throw new AssertionError(response);
+            fail(response);
         if (NetworkHelper.GetFriends(access_token2).size() != 0)
-            throw new AssertionError(response);
+            fail(response);
     }
 
 
@@ -617,9 +792,9 @@ public class NetworkHelperUnitTest {
         // Checks that there are no friend requests present before
         // they are sent
         if (NetworkHelper.GetIncomingFriendRequests(access_token2) != null)
-            throw new AssertionError();
+            fail();
         if (NetworkHelper.GetIncomingFriendRequests(access_token1) != null)
-            throw new AssertionError();
+            fail();
 
         // User 2 sends friend request to user 1
         NetworkHelper.AddFriend(username1, access_token2);
@@ -628,7 +803,7 @@ public class NetworkHelperUnitTest {
         HashMap<String, String> out = NetworkHelper.GetIncomingFriendRequests(access_token1);
 
         // Checks that user 2's friend request is received by user 1
-        if (!out.keySet().contains(username2)) throw new AssertionError();
+        if (!out.keySet().contains(username2)) fail();
     }
 
 
@@ -653,7 +828,7 @@ public class NetworkHelperUnitTest {
         if (NetworkHelper.GetOutgoingFriendRequests(access_token2) != null)
             new AssertionError();
         if (NetworkHelper.GetOutgoingFriendRequests(access_token1) != null)
-            throw new AssertionError();
+            fail();
 
         // User 2 sends friend request to user 1
         NetworkHelper.AddFriend(username1, access_token2);
@@ -662,7 +837,7 @@ public class NetworkHelperUnitTest {
         ArrayList<ArrayList<String>> out = NetworkHelper
                 .GetOutgoingFriendRequests(access_token2);
         if (!out.get(0).get(0).toString().equals(username1))
-            throw new AssertionError();
+            fail();
     }
 
 
@@ -675,10 +850,12 @@ public class NetworkHelperUnitTest {
      * @param httpResponse: A string of the http response received from the
      *                      server
      * @return If the message was successful
-     */
+     /
     private Boolean isAccepted(String httpResponse){
         return httpResponse.charAt(0) == '2';
     }
+
+    */
 }
 
 

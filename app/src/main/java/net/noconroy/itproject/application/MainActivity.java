@@ -17,10 +17,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+
 import net.noconroy.itproject.application.AR.CompassActivity;
 import net.noconroy.itproject.application.AR.LocationService;
 import net.noconroy.itproject.application.AR.LocationServiceProvider;
 import net.noconroy.itproject.application.Chat.ChatActivity;
+import net.noconroy.itproject.application.callbacks.AuthenticationCallback;
+import net.noconroy.itproject.application.callbacks.EmptyCallback;
+import net.noconroy.itproject.application.callbacks.NetworkCallback;
 
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS;
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS_KEY;
@@ -28,6 +32,7 @@ import static net.noconroy.itproject.application.HomeActivity.AT_PREFS_KEY;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String ACCESS_TOKEN_INTENT_KEY = "access_token_intent_key";
 
     private static final int MY_CAMERA_REQUEST_CODE = 100;
 
@@ -43,17 +48,19 @@ public class MainActivity extends AppCompatActivity {
     /*****************************  Class Methods  *****************************************/
     /***************************************************************************************/
 
-    private String access_token = null;
 
+    private DataStorage ds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ds = DataStorage.getInstance();
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
-        access_token = intent.getStringExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE);
+        String token = intent.getStringExtra(ACCESS_TOKEN_INTENT_KEY);
+        if(token != null) ds.setAccessToken(token);
 
         // Set all location parameters
         mLocationServiceIntent = null;
@@ -85,13 +92,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logout(View view) {
-        Intent intent = new Intent(this, HomeActivity.class);
+        final Intent intent = new Intent(this, HomeActivity.class);
         SharedPreferences settings = getSharedPreferences(AT_PREFS, 0);
         settings.edit().remove(AT_PREFS_KEY).commit();
 
         stopLocationService();
-        NetworkHelper.Logout(access_token);
+        // TODO only logout on successful logout;
+        NetworkHelper.Logout(new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {
 
+            }
+
+            @Override
+            public void onFailure(Failure f) {
+
+            }
+        });
         startActivity(intent);
         finish();
     }
@@ -102,8 +119,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void friends(View view) {
-        Intent intent = new Intent(MainActivity.this, Friends.class);
-        intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
+        Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
         startActivity(intent);
     }
 
@@ -164,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
             // Note this is asynchronous -- so have to start the service within this task
             mLocationService = ((LocationService.LocationBinder) service).getService();
             mLocationService.registerClient(MainActivity.this);
-            mLocationService.registerAccessToken(access_token);
             startService(mLocationServiceIntent);
 ;
             // We also add this location service to LocationServiceProvider

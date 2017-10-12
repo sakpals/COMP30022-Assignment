@@ -18,9 +18,20 @@
         android:id="@+id/RemoveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Remove"
+        android:layout_alignBaseline="@+id/FriendUsername"
+        android:layout_alignBottom="@+id/FriendUsername"
+        android:layout_toLeftOf="@+id/ChatButton"
+        android:layout_toStartOf="@+id/ChatButton" />
+
+    <Button
+        android:id="@+id/ChatButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_margin="8dp"
-        android:text="Remove"
+        android:text="Chat"
         />
+
 </RelativeLayout>
