@@ -1,5 +1,7 @@
 package net.noconroy.itproject.application.AR;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Mattias on 14/09/2017.
  */
@@ -10,6 +12,7 @@ public class FriendDrawing {
     private double long_;
     private String id;
     private String name;
+    private Bitmap userImage;
 
     private double rotationFromNorth;       // Will be used by CompassManager to render the position of our friend
 
@@ -47,4 +50,6 @@ public class FriendDrawing {
     public void setName(String name) {
         this.name = name;
     }
+    public Bitmap getBitmap() { return userImage; }
+    public void setBitmap(Bitmap userImage) { this.userImage = userImage; }
 }

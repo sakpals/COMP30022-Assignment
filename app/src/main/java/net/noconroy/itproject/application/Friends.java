@@ -138,7 +138,7 @@ public class Friends extends AppCompatActivity {
 
 
 
-    private void ShareLocation() {
+    public void ShareLocation(View view) {
         if (!LocationServiceProvider.extendLocationUpdates(0.5f)) {
             Log.d(TAG, "can't extend location updates");
         } else {

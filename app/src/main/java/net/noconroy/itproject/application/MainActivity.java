@@ -16,12 +16,10 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import net.noconroy.itproject.application.AR.CompassActivity;
 import net.noconroy.itproject.application.AR.LocationService;
 import net.noconroy.itproject.application.AR.LocationServiceProvider;
-
 import net.noconroy.itproject.application.Chat.ChatActivity;
 
 import static net.noconroy.itproject.application.HomeActivity.AT_PREFS;
@@ -80,18 +78,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    // Called when the user clicks the send button
-    public void GetDeviceLocation(View view) {
-        Intent intent = new Intent(this, DeviceLocationActivity.class);
-        startActivity(intent);
-
-        // Using this as temporary example to extend location timer
-        // extend timer for 5 minutes
-        if (!LocationServiceProvider.extendLocationUpdates(0.5f)) {
-            Log.d(TAG, "can't extend location updates");
-        }
-    }
-
     // Called when the user clicks the compass button
     public void GetCompass(View view) {
         Intent intent = new Intent(this, CompassActivity.class);
@@ -120,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(RegisterActivity.ACCESS_TOKEN_MESSAGE, access_token);
         startActivity(intent);
     }
-
 
     public void startChat(View view) {
         Intent intent = new Intent(this, ChatActivity.class);

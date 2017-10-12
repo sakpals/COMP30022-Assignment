@@ -1,7 +1,16 @@
 package net.noconroy.itproject.application.AR;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.util.Log;
+
+import net.noconroy.itproject.application.NetworkHelper;
+import net.noconroy.itproject.application.R;
+import net.noconroy.itproject.application.RegisterActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +26,7 @@ public class CompassFriend extends Thread {
 
     private static final String TAG = CompassFriend.class.getSimpleName();
 
+    private Context context;
     private ArrayList<FriendDrawing> friendDrawings;
     private boolean running;
 
@@ -28,7 +38,8 @@ public class CompassFriend extends Thread {
     /*********************************** Class Methods *************************************/
     /***************************************************************************************/
 
-    public CompassFriend(ArrayList<FriendDrawing> friendDrawings) {
+    public CompassFriend(ArrayList<FriendDrawing> friendDrawings, Context context) {
+        this.context = context;
         this.friendDrawings = friendDrawings;
         setRunning(false);
 
@@ -46,15 +57,16 @@ public class CompassFriend extends Thread {
             // loop through JSONArray
 
             // for now we create an example location - friends
-
+            AsyncTask getFriendLocation = new RetrieveFriendLocation(RegisterActivity.ACCESS_TOKEN_MESSAGE);
+            getFriendLocation.execute();
             // once we have friends position - either update friends drawing with that friends
             // position or create a new object inside of it
-
+            /*
             try {
                 loopThroughJSONArrayAddToFriends(friends);
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             // note - we'll probably have to introduce a timer for how long we can get a friends
             // location - so probably add a timer for each object i.e. 10 minutes after 10 minutes
@@ -68,6 +80,90 @@ public class CompassFriend extends Thread {
             }
         }
     }
+
+
+
+    public class RetrieveFriendLocation extends AsyncTask<Object, Void, Boolean> {
+
+        private String access_token;
+        private String[] status = null;
+
+        public RetrieveFriendLocation(String access_token) {
+            this.access_token = access_token;
+        }
+
+        @Override
+        protected Boolean doInBackground(Object... params) {
+            status = NetworkHelper.RetrieveLocation("bob111", access_token);
+
+            if (status == null) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                Log.i(TAG, "Received friend locations.");
+                try {
+                    retrieveFriendLocation(status);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                ;
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            ;
+        }
+    }
+
+    private void retrieveFriendLocation(String[] friends) {
+        if (!friendExists(friends)) {
+            FriendDrawing newFriend = new FriendDrawing();
+
+            // Set the friends rotation from north
+            newFriend.setRotationFromNorth(Double.valueOf(friends[1]));
+
+            // Create a random id value
+            newFriend.setId("1");
+
+            // Set the friends image on the AR view
+            Resources res = context.getResources();
+            Bitmap map = BitmapFactory.decodeResource(res, R.drawable.default_image_png);
+            Bitmap resized_map = reduceBitmapSize(map, 100);
+            newFriend.setBitmap(resized_map);
+
+            friendDrawings.add(newFriend);
+        }
+    }
+
+    private boolean friendExists(String[] friends) {
+        if (!friendDrawings.isEmpty()) {
+            for (FriendDrawing friend : friendDrawings) {
+
+
+                // Have to hard code this for now -- as we're not getting any id values from the server
+                // IF we dont get ID values from server we have to periodically clear the friendsdrawing
+                if (friend.getId().equals("1")) {
+                    friend.setRotationFromNorth(Double.valueOf(friends[0]));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+
+
+
+
 
     private void loopThroughJSONArrayAddToFriends(JSONArray friends) throws JSONException {
 
@@ -85,6 +181,15 @@ public class CompassFriend extends Thread {
                 newFriend.setName(friend.getString("name"));
                 newFriend.setLat(Double.valueOf(friend.getString("lat")));
                 newFriend.setLong_(Double.valueOf(friend.getString("long")));
+
+                if (friend.getString("image").equals("na")) {
+                    Resources res = context.getResources();
+                    Bitmap map = BitmapFactory.decodeResource(res, R.drawable.default_image_png);
+                    Bitmap resized_map = reduceBitmapSize(map, 100);
+                    newFriend.setBitmap(resized_map);
+                }
+
+                // newFriend.setRotationFromNorth(
                 updateBearingFromNorth(newFriend);
 
                 // add that friend to the list of friends to render
@@ -143,11 +248,13 @@ public class CompassFriend extends Thread {
             friend1.put("name", "bob");
             friend1.put("lat", "-37.84391867784434");
             friend1.put("long", "145.062575340271");
+            friend1.put("image", "na");
 
             friend2.put("id", "2");
             friend2.put("name", "james");
             friend2.put("lat", "-37.813628");
             friend2.put("long", "144.963058");
+            friend2.put("image", "na");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -157,6 +264,21 @@ public class CompassFriend extends Thread {
         array.put(friend1);
         array.put(friend2);
         return array;
+    }
+
+    private Bitmap reduceBitmapSize(Bitmap map, int maxSize) {
+        int width = map.getWidth();
+        int height = map.getHeight();
+
+        float bitmapRatio = ((float) width / (float) height);
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(map, width, height, true);
     }
 
     public boolean isRunning() {return running;}

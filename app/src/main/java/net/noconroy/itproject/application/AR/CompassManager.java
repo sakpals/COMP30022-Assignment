@@ -1,6 +1,7 @@
 package net.noconroy.itproject.application.AR;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -151,7 +152,7 @@ public class CompassManager extends Thread implements SensorEventListener {
 
         // Whenever we add to friendDrawings in CompassFriend it will also add to our
         // local object here
-        compassFriendThread = new CompassFriend(friendDrawings);
+        compassFriendThread = new CompassFriend(friendDrawings, mContext);
         compassFriendThread.setRunning(true);
         compassFriendThread.start();
     }
@@ -374,10 +375,12 @@ public class CompassManager extends Thread implements SensorEventListener {
                 rotationFromNorth - (INTERVAL * compassDegreeInterval) / 2 < NORTH) {
 
             for (int i = 0; i < direction_values.length; i++) {
-                addCardinalDirections(canvasDrawing, rotationFromNorth, ROTATION, directions[i], direction_values[i]);
+                addCardinalDirections(canvasDrawing, rotationFromNorth, ROTATION,
+                        directions[i], direction_values[i], null);
             }
             for (int i = 0; i < friendDrawings.size(); i++) {
-                addCardinalDirections(canvasDrawing, rotationFromNorth, ROTATION, friendDrawings.get(i).getId(), (int)friendDrawings.get(i).getRotationFromNorth());
+                addCardinalDirections(canvasDrawing, rotationFromNorth, ROTATION,
+                        friendDrawings.get(i).getId(), (int)friendDrawings.get(i).getRotationFromNorth(), friendDrawings.get(i).getBitmap());
             }
 
         }
@@ -385,10 +388,12 @@ public class CompassManager extends Thread implements SensorEventListener {
         // Otherwise the boundaries are fine
         else {
             for (int i = 0; i < direction_values.length; i++) {
-                addCardinalDirections(canvasDrawing, rotationFromNorth, 0, directions[i], direction_values[i]);
+                addCardinalDirections(canvasDrawing, rotationFromNorth, 0,
+                        directions[i], direction_values[i], null);
             }
             for (int i = 0; i < friendDrawings.size(); i++) {
-                addCardinalDirections(canvasDrawing, rotationFromNorth, 0, friendDrawings.get(i).getId(), (int)friendDrawings.get(i).getRotationFromNorth());
+                addCardinalDirections(canvasDrawing, rotationFromNorth, 0,
+                        friendDrawings.get(i).getId(), (int)friendDrawings.get(i).getRotationFromNorth(), friendDrawings.get(i).getBitmap());
             }
         }
     }
@@ -404,7 +409,7 @@ public class CompassManager extends Thread implements SensorEventListener {
      * whether they can be added based on the compasses rotation.
      */
     private void addCardinalDirections(CompassDrawing canvasDrawing, float rotationFromNorth,
-                                       int boundaryAddition, String direction, int direction_value) {
+                                       int boundaryAddition, String direction, int direction_value, Bitmap image) {
         float starting_x;
 
         if (drawCardinalDirection(direction_value + boundaryAddition, rotationFromNorth) ||
@@ -418,7 +423,8 @@ public class CompassManager extends Thread implements SensorEventListener {
                     starting_x,
                     rectTop + (rectHeight / 2),
                     position,
-                    rectTop + (rectHeight / 2)
+                    rectTop + (rectHeight / 2),
+                    image
             ));
         }
     }
