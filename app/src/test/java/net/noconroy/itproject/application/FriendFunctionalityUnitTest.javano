@@ -302,9 +302,20 @@ public class FriendFunctionalityUnitTest {
      * @param username the username of the friend to be removed
      */
     public void removeFriendFromList(ArrayList<ArrayList<String>> list, String username) {
-        for(int i=0; i < list.size(); i ++) {
-            if(list.get(i).contains(username)) {
-                list.remove(i);
+        // uses an iterator for SAFER removal of elements from ArrayList
+        Iterator iter = list.iterator();
+        ArrayList<String> user;
+        user = (ArrayList<String>) iter.next();
+        if(user != null) {
+            if(user.contains(username)) {
+                iter.remove();
+            }
+        }
+
+        while(iter.hasNext()) {
+            user = (ArrayList<String>) iter.next();
+            if(user.contains(username)) {
+                iter.remove();
             }
         }
     }

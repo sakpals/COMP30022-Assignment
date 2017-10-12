@@ -1,5 +1,7 @@
 package net.noconroy.itproject.application.AR;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Mattias on 14/09/2017.
  */
@@ -11,15 +13,16 @@ public class CardinalDrawing {
     private float starting_y;
     private float end_x;
     private float end_y;
+    private Bitmap image;
 
     public CardinalDrawing(String cardinalDirection, float starting_x, float starting_y,
-                           float end_x, float end_y) {
+                           float end_x, float end_y, Bitmap image) {
         this.cardinalDirection = cardinalDirection;
         this.starting_x = starting_x;
         this.starting_y = starting_y;
         this.end_x = end_x;
         this.end_y = end_y;
-
+        this.image = image;
     }
 
     public String getCardinalDirection() {
@@ -61,4 +64,8 @@ public class CardinalDrawing {
     public void setEnd_y(float end_y) {
         this.end_y = end_y;
     }
+
+    public Bitmap getImage() { return image; }
+
+    public void setImage(Bitmap image) {this.image = image;}
 }

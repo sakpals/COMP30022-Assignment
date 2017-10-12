@@ -92,10 +92,20 @@ public class CompassRender extends Thread {
 
                             // draw cardinal directions && friend markers
                             for (CardinalDrawing cardinalObject : currentObjectBeingDrawn.cardinalDirections) {
-                                canvas.drawText(cardinalObject.getCardinalDirection(),
-                                        cardinalObject.getStarting_x() + ((cardinalObject.getEnd_x() - cardinalObject.getStarting_x()) / animationdelay) * iteration,
-                                        cardinalObject.getEnd_y(),
-                                        textPaint);
+                                if (cardinalObject.getImage() != null) {
+                                    canvas.drawBitmap(
+                                            cardinalObject.getImage(),
+                                            cardinalObject.getStarting_x() + ((cardinalObject.getEnd_x() - cardinalObject.getStarting_x()) / animationdelay) * iteration,
+                                            cardinalObject.getEnd_y() - 30,
+                                            textPaint
+                                    );
+                                }
+                                else {
+                                    canvas.drawText(cardinalObject.getCardinalDirection(),
+                                            cardinalObject.getStarting_x() + ((cardinalObject.getEnd_x() - cardinalObject.getStarting_x()) / animationdelay) * iteration,
+                                            cardinalObject.getEnd_y(),
+                                            textPaint);
+                                }
                             }
 
                             // update iteration
