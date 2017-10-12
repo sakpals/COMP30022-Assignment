@@ -278,7 +278,7 @@ public class LocationService extends Service {
         }
 
         if (ds.me != null) {
-            if (currentActivity.sharingLocation) {
+            if (LocationServiceProvider.sharingLocation) {
                 Log.i(TAG, "Location sharing is enabled, location will be updated.");
                 NetworkHelper.UpdateLocation(ds.me.username,
                         mCurrentLocation.getLatitude(),
@@ -288,15 +288,6 @@ public class LocationService extends Service {
                             @Override
                             public void onFailure(Failure f) {}
                         });
-            }
-            else {
-                Log.i(TAG, "Location sharing is disabled, location will not be updated");
-                NetworkHelper.ResetLocation(ds.me.username, new EmptyCallback(null) {
-                    @Override
-                    public void onSuccess() {}
-                    @Override
-                    public void onFailure(Failure f) {}
-                });
             }
         }
     }
@@ -316,6 +307,14 @@ public class LocationService extends Service {
 
         mRequestingLocationUpdates = false;
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+
+        Log.i(TAG, "Resetting users location when they close the application -- or location services");
+        NetworkHelper.ResetLocation(ds.me.username, new EmptyCallback(null) {
+            @Override
+            public void onSuccess() {}
+            @Override
+            public void onFailure(Failure f) {}
+        });
     }
 
 

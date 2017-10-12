@@ -40,7 +40,10 @@ public class CompassFriend extends Thread {
     public void run() {
 
         while (running) {
-            RetrieveAllFriendLocations();
+
+            if (LocationServiceProvider.sharingLocation) {
+                RetrieveAllFriendLocations();
+            }
 
             try {
                 Thread.sleep(10000);            // Every 10 seconds retrieve friend location
@@ -101,7 +104,24 @@ public class CompassFriend extends Thread {
 
             @Override
             public void onFailure(Failure f) {
-                Log.i(TAG, "Retrieving a friend location has failed!");
+                Log.i(TAG, "Retrieving a friend location has failed -- we assume that his location is not being shared!");
+
+                // Remove friend from friendDrawings -- if they're being rendered, and their locations are
+                // not being shared anymore
+                try {
+                    FriendDrawing friendToRemove = null;
+                    for (FriendDrawing frienddrawing : friendDrawings) {
+                        if (frienddrawing.getName().equals(friend.profile.username)) {
+                            friendToRemove = frienddrawing;
+                        }
+                    }
+
+                    if (friendToRemove != null) {
+                        friendDrawings.remove(friendToRemove);
+                    }
+                } catch (Exception e) {
+                    ;
+                }
             }
         });
     }

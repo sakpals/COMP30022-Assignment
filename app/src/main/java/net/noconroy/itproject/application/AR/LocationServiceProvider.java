@@ -15,6 +15,8 @@ public class LocationServiceProvider {
 
     private static LocationService locationService = null;
 
+    public static boolean sharingLocation = false;
+
     public static LocationService createLocationService(LocationService mLocationService) {
         locationService = mLocationService;
         return null;

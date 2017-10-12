@@ -124,8 +124,19 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             sharingLocation = true;
-        } else {
-            sharingLocation = false;
+            LocationServiceProvider.sharingLocation = true;
+        }
+
+        else {
+            LocationServiceProvider.sharingLocation = true;
+            Log.i(TAG, "Location sharing is disabled, location will not be updated");
+
+            NetworkHelper.ResetLocation(ds.me.username, new EmptyCallback(null) {
+                @Override
+                public void onSuccess() {}
+                @Override
+                public void onFailure(Failure f) {}
+            });
         }
     }
 
