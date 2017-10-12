@@ -8,7 +8,6 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import net.noconroy.itproject.application.NetworkHelper;
 import net.noconroy.itproject.application.R;
 import net.noconroy.itproject.application.RegisterActivity;
 
@@ -94,7 +93,7 @@ public class CompassFriend extends Thread {
 
         @Override
         protected Boolean doInBackground(Object... params) {
-            status = NetworkHelper.RetrieveLocation("bob111", access_token);
+            // status = NetworkHelper.RetrieveLocation("bob111", access_token);
 
             if (status == null) {
                 return false;

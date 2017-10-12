@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.Looper;
@@ -33,9 +32,7 @@ import net.noconroy.itproject.application.AppLifecycleHandler;
 import net.noconroy.itproject.application.DataStorage;
 import net.noconroy.itproject.application.MainActivity;
 import net.noconroy.itproject.application.NetworkHelper;
-import net.noconroy.itproject.application.RegisterActivity;
 import net.noconroy.itproject.application.callbacks.EmptyCallback;
-import net.noconroy.itproject.application.callbacks.NetworkCallback;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -278,6 +275,8 @@ public class LocationService extends Service {
             Log.i(TAG, "User is currently not requesting and location updates.");
             return;
         }
+
+        Log.i(TAG, "Location has been updated.");
 
         NetworkHelper.UpdateLocation(ds.me.username,
                 mCurrentLocation.getLatitude(),
