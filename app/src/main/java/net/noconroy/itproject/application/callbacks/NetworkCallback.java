@@ -63,8 +63,16 @@ public abstract class NetworkCallback<T> implements Callback {
                     onSuccess(null);
                 }
             } else {
-                Gson gson = new Gson();
-                Failure f = gson.fromJson(body, Failure.class);
+                Failure f;
+                try {
+                    Gson gson = new Gson();
+                    f = gson.fromJson(body, Failure.class);
+                } catch (Exception e) {
+                    f = new Failure();
+                    JsonObject m = new JsonObject();
+                    m.addProperty("error", "Server error");
+                    f.message = m;
+                }
                 f.code = response.code();
                 onFailure(f);
             }
