@@ -40,7 +40,7 @@ public class AddFriendActivity extends AppCompatActivity {
      */
     public void attemptFindUser() {
 
-        String username = mSearchUser.getText().toString();
+        String username = mSearchUser.getText().toString().trim();
 
         if(TextUtils.isEmpty(username) || username == null) {
             mSearchUser.setError("No username entered");
