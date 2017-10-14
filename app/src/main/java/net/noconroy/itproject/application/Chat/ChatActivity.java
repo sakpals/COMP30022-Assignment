@@ -48,8 +48,10 @@ public class ChatActivity extends AppCompatActivity {
     NetworkHelper.Receiver receiver = new NetworkHelper.Receiver() {
         @Override
         public void process(Message message) {
-            chatAdapter.Add(message);
-            ChatActivity.this.runOnUiThread(updateRunnable);
+            if(message.filter(userClickedOnName)) {
+                chatAdapter.Add(message);
+                ChatActivity.this.runOnUiThread(updateRunnable);
+            }
         }
     };
 

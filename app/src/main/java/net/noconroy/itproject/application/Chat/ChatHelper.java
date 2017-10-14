@@ -37,6 +37,7 @@ public final class ChatHelper {
 
     private final static String CHAT_MESSAGE_TYPE = "m.message.text";
     private final static String CHAT_MESSAGE_DATA = "text";
+    public final static String USER_CHANNEL_PREFIX = "user_";
 
     private HashMap<String, ArrayList<Message>> messages = new HashMap<>();
     private Activity activity = null;
@@ -45,7 +46,7 @@ public final class ChatHelper {
 
         JsonObject msg = new JsonObject();
         msg.addProperty(CHAT_MESSAGE_DATA, message);
-        NetworkHelper.ChannelMessage("user_" + username, CHAT_MESSAGE_TYPE, msg, new NetworkCallback<Message>(Message.class, null) {
+        NetworkHelper.ChannelMessage(USER_CHANNEL_PREFIX + username, CHAT_MESSAGE_TYPE, msg, new NetworkCallback<Message>(Message.class, null) {
             @Override
             public void onSuccess(Message new_message) {
                 AddMessage(new_message);
@@ -120,8 +121,8 @@ public final class ChatHelper {
             }
         };
 
-        NetworkHelper.ChannelMessages("user_"+name, cb);
-        NetworkHelper.ChannelMessages("user_"+friend, cb);
+        NetworkHelper.ChannelMessages(USER_CHANNEL_PREFIX+name, cb);
+        NetworkHelper.ChannelMessages(USER_CHANNEL_PREFIX+friend, cb);
     }
 
     public void stop() {
