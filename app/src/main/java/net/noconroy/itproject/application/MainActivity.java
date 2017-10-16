@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public static final String LOCATION_SHARING_DISABLED_MESSAGE =
             "Location sharing is disabled, location will not be updated";
     public static final String LOCATION_PERMISSION_GRANTED_MESSAGE=
-            "Location permission granted, updates requested, starting location updates");
+            "Location permission granted, updates requested, starting location updates";
     public static final String LOCATION_PERMISSION_DENIED_MESSAGE=
             "Permission denied, will need to tell user that app is unable to run " +
                     "without appropriate location settings.";
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // If user interaction was interrupted, the permission request is cancelled and you
             // receive empty arrays.
             if (grantResults.length <= 0) {
-                Log.i(TAG, USER_INTERACTOON_CANCELLED);
+                Log.i(TAG, USER_INTERACTION_CANCELLED_MESSAGE);
             }
 
             // Permission was granted
