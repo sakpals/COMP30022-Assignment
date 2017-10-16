@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import net.noconroy.itproject.application.AR.CompassActivity;
 import net.noconroy.itproject.application.AR.LocationService;
@@ -140,7 +141,15 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public void extendLocationService(View view) {
         if (LocationServiceProvider.sharingLocation) {
             Log.i(TAG, "Extending location services for 10 minutes!");
+            Toast t = Toast.makeText(getApplicationContext(),
+                    "Extending location services for 10 minutes!", Toast.LENGTH_SHORT);
+            t.show();
             LocationServiceProvider.extendLocationUpdates(10);
+        }
+        else{
+            Toast t = Toast.makeText(getApplicationContext(),
+                    "Must turn location sharing on first (use switch on top left of screen)", Toast.LENGTH_SHORT);
+            t.show();
         }
     }
 
