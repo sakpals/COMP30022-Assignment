@@ -29,6 +29,9 @@ public class HomeActivity extends AppCompatActivity {
     public static final String AT_PREFS = "AccessTokenPrefs";
     public static final String AT_PREFS_KEY = "AccessTokenPrefs_KEY";
 
+    // Error messages
+    private static final String FAILED_REGISTER_LOGIN_MESSAGE = "Register/Sign In Unsuccessful";
+
     // UI references.
     private AutoCompleteTextView mUsernameView;
     private EditText mPasswordView;
@@ -90,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onFailure(Failure f) {
                 showProgress(false);
                 Toast t = Toast.makeText(getApplicationContext(),
-                        "Register/Sign In Unsuccessful", Toast.LENGTH_SHORT);
+                        FAILED_REGISTER_LOGIN_MESSAGE, Toast.LENGTH_SHORT);
                 t.show();
             }
         };
