@@ -29,18 +29,11 @@
             android:name=".MainActivity">
         </activity>
         <activity
-            android:name=".CameraActivity"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
-        <activity
             android:name=".AddFriendActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".FriendsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".FriendsActivity" />
         </activity>
         <activity
             android:name=".RegisterActivity"
@@ -64,8 +57,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".FriendsActivity" />
-        <activity android:name=".FriendRequestsActivity" />
+        <activity
+            android:name=".FriendsActivity"
+            android:parentActivityName=".MainActivity"></activity>
+
+        <activity
+            android:name=".FriendRequestsActivity"
+            android:parentActivityName=".FriendsActivity"></activity>
 
         <service android:name=".AR.LocationService" />
 

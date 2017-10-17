@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import net.noconroy.itproject.application.AR.CompassActivity;
 import net.noconroy.itproject.application.AR.LocationService;
@@ -33,6 +34,33 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public static final String ACCESS_TOKEN_INTENT_KEY = "access_token_intent_key";
 
     private static final int MY_CAMERA_REQUEST_CODE = 100;
+
+    /***************************************************************************************/
+    /******************************** Pop Up/Logcat Messages *******************************/
+    /***************************************************************************************/
+
+    // Pop Up/Logcat Messages
+    public static final String EXTENDING_LOCATION_SERVICES_SUCCESS_MESSAGE =
+            "Extending location services for 10 minutes!";
+    public static final String LOCATION_SHARING_FAILURE_MESSAGE =
+            "Must turn location sharing on first (use switch on top left of screen)";
+    public static final String LOCATION_SHARING_DISABLED_MESSAGE =
+            "Location sharing is disabled, location will not be updated";
+    public static final String LOCATION_PERMISSION_GRANTED_MESSAGE=
+            "Location permission granted, updates requested, starting location updates";
+    public static final String LOCATION_PERMISSION_DENIED_MESSAGE=
+            "Permission denied, will need to tell user that app is unable to run " +
+                    "without appropriate location settings.";
+    public static final String CAMERA_PERMISSION_GRANTED_MESSAGE=
+            "Camera permissions was granted";
+    public static final String CAMERA_PERMISSION_DENIED_MESSAGE=
+            "Camera permissions wasn't granted";
+    public static final String USER_INTERACTION_CANCELLED_MESSAGE =
+            "User interaction was cancelled.";
+    public static final String USER_LOCATION_SETING_CHANGE_SUCCESS_MESSAGE =
+            "User agreed to make required location settings changes.";
+    public static final String USER_LOCATION_SETING_CHANGE_FAILURE_MESSAGE =
+            "User chose not to make required location settings changes.";
 
     /***************************************************************************************/
     /********************************** Location Variables *********************************/
@@ -126,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         else {
             LocationServiceProvider.sharingLocation = false;
-            Log.i(TAG, "Location sharing is disabled, location will not be updated");
+            Log.i(TAG, LOCATION_SHARING_DISABLED_MESSAGE);
 
             NetworkHelper.ResetLocation(ds.me.username, new EmptyCallback(null) {
                 @Override
@@ -139,8 +167,16 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     public void extendLocationService(View view) {
         if (LocationServiceProvider.sharingLocation) {
-            Log.i(TAG, "Extending location services for 10 minutes!");
+            Log.i(TAG, EXTENDING_LOCATION_SERVICES_SUCCESS_MESSAGE);
+            Toast t = Toast.makeText(getApplicationContext(),
+                    EXTENDING_LOCATION_SERVICES_SUCCESS_MESSAGE, Toast.LENGTH_SHORT);
+            t.show();
             LocationServiceProvider.extendLocationUpdates(10);
+        }
+        else{
+            Toast t = Toast.makeText(getApplicationContext(),
+                    LOCATION_SHARING_FAILURE_MESSAGE, Toast.LENGTH_SHORT);
+            t.show();
         }
     }
 
@@ -239,13 +275,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // If user interaction was interrupted, the permission request is cancelled and you
             // receive empty arrays.
             if (grantResults.length <= 0) {
-                Log.i(TAG, "User interaction was cancelled.");
+                Log.i(TAG, USER_INTERACTION_CANCELLED_MESSAGE);
             }
 
             // Permission was granted
             else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (mLocationService.mRequestingLocationUpdates) {
-                    Log.i(TAG, "Location permission granted, updates requested, starting location updates");
+                    Log.i(TAG, LOCATION_PERMISSION_GRANTED_MESSAGE);
                     mLocationService.startLocationUpdates();
 
                     // We now try to get permissions for the camera
@@ -257,19 +293,18 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
             // Permission denied - assume this never occurs for now
             else {
-                Log.i(TAG, "Permission denied, will need to tell user that app is unable to run " +
-                        "without appropriate location settings.");
+                Log.i(TAG, LOCATION_PERMISSION_DENIED_MESSAGE);
             }
         }
 
         else if (requestCode == MY_CAMERA_REQUEST_CODE) {
             if (grantResults.length <= 0) {
-                Log.i(TAG, "User interaction was cancelled.");
+                Log.i(TAG, USER_INTERACTION_CANCELLED_MESSAGE);
             }
             else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Camera permissions was granted");
+                Log.d(TAG, CAMERA_PERMISSION_GRANTED_MESSAGE);
             } else {
-                Log.d(TAG, "Camera permissions wasn't granted");
+                Log.d(TAG, CAMERA_PERMISSION_DENIED_MESSAGE);
             }
         }
     }
@@ -292,11 +327,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
                     case Activity.RESULT_OK:
                         // Nothing to do. startLocationupdates() gets called in onResume again.
-                        Log.i(TAG, "User agreed to make required location settings changes.");
+                        Log.i(TAG, USER_LOCATION_SETING_CHANGE_SUCCESS_MESSAGE);
                         break;
 
                     case Activity.RESULT_CANCELED:
-                        Log.i(TAG, "User chose not to make required location settings changes.");
+                        Log.i(TAG, USER_LOCATION_SETING_CHANGE_FAILURE_MESSAGE);
                         mLocationService.mRequestingLocationUpdates = false;
                         mLocationService.updateLocation();
                         break;

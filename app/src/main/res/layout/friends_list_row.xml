@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingRight="16dp" >
 
     <TextView
         android:id="@+id/FriendUsername"
@@ -19,8 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Remove"
-        android:layout_alignBaseline="@+id/FriendUsername"
-        android:layout_alignBottom="@+id/FriendUsername"
+        android:layout_alignBaseline="@+id/ChatButton"
+        android:layout_alignBottom="@+id/ChatButton"
         android:layout_toLeftOf="@+id/ChatButton"
         android:layout_toStartOf="@+id/ChatButton" />
 
