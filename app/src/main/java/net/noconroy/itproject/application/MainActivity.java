@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public static final String EXTENDING_LOCATION_SERVICES_SUCCESS_MESSAGE =
             "Extending location services for 10 minutes!";
     public static final String LOCATION_SHARING_FAILURE_MESSAGE =
-            "Must turn location sharing on first (use switch on top left of screen)";
+            "Must turn location sharing on first (use switch on top right of screen)";
     public static final String LOCATION_SHARING_DISABLED_MESSAGE =
             "Location sharing is disabled, location will not be updated";
     public static final String LOCATION_PERMISSION_GRANTED_MESSAGE=
