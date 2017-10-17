@@ -25,6 +25,7 @@ public class CompassFriend extends Thread {
     private Context context;
     private ArrayList<FriendDrawing> friendDrawings;
     private boolean running;
+    private int removeCount = 0;
 
     /***************************************************************************************/
     /*********************************** Class Methods *************************************/
@@ -33,6 +34,7 @@ public class CompassFriend extends Thread {
     public CompassFriend(ArrayList<FriendDrawing> friendDrawings, Context context) {
         this.context = context;
         this.friendDrawings = friendDrawings;
+        removeCount = 0;
         setRunning(false);
     }
 
@@ -46,7 +48,7 @@ public class CompassFriend extends Thread {
             }
 
             try {
-                Thread.sleep(10000);            // Every 10 seconds retrieve friend location
+                Thread.sleep(5000);            // Every 5s seconds retrieve friend location
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -109,6 +111,7 @@ public class CompassFriend extends Thread {
                 // Remove friend from friendDrawings -- if they're being rendered, and their locations are
                 // not being shared anymore
                 try {
+                    removeCount++;
                     FriendDrawing friendToRemove = null;
                     for (FriendDrawing frienddrawing : friendDrawings) {
                         if (frienddrawing.getName().equals(friend.profile.username)) {
@@ -116,8 +119,9 @@ public class CompassFriend extends Thread {
                         }
                     }
 
-                    if (friendToRemove != null) {
+                    if (friendToRemove != null && removeCount == 3) {
                         friendDrawings.remove(friendToRemove);
+                        removeCount = 0;
                     }
                 } catch (Exception e) {
                     ;
