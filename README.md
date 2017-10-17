@@ -31,36 +31,98 @@ Please note that some files less strictly relavant to development (like automati
 ```
 root/app/src
  |
+ |
  +-main (stores the actual code for running the app)
  |  |
+ |  |
  |  +-AndroidManifest.xml (contains permissions and information about activities)
+ |  |
  |  +-java/net/noconroy/itproject/application (the logic for running the app)
  |  |  |
+ |  |  |
+ |  |  +- AR (contains logic for the AR view)
+ |  |  |  |
+ |  |  |  +-CameraFragment.java
+ |  |  |  +-CameraPreview.java
+ |  |  |  +-CameraSurfaceView.java
+ |  |  |  +-CardinalDrawing.java
+ |  |  |  +-CompassActivity.java
+ |  |  |  +-CompassFriend.java
+ |  |  |  +-CompassManager.java
+ |  |  |  +-CompassRender.java
+ |  |  |  +-CompassSurfacView.java
+ |  |  |  +-FriendDrawing.java
+ |  |  |  +-LocationCompare.java
+ |  |  |  +-LocationService.java
+ |  |  |  +-LocationServiceProvider.java
+ |  |  |  
+ |  |  |
+ |  |  +- callbacks (contains logic for callbacks involved with the server" 
+ |  |  |  |
+ |  |  |  +-AuthenticationCallback.java
+ |  |  |  +-EmptyCallback.java
+ |  |  |  +-NetworkCallback.java
+ |  |  |
+ |  |  |
+ |  |  +- Chat (contains logic for chat)
+ |  |  |  |
+ |  |  |  +-ChatActivity.java
+ |  |  |  +-ChatAdapter.java
+ |  |  |  +-ChatHelper.java
+ |  |  |
+ |  |  |
+ |  |  +- models (classes that allows logical storing of data)
+ |  |  |  |
+ |  |  |  +-Friends.java
+ |  |  |  +-IncomingFriendRequests.java
+ |  |  |  +-Message.java
+ |  |  |  +-Orientation.java
+ |  |  |  +-OutgoingFriendRequests.java
+ |  |  |  +-Profile.java
+ |  |  |
+ |  |  |
  |  |  +-AddFriendActivity.java (activity that allows adding a friend)
- |  |  +-ChatHelper.java (restful interface for chat functionality)
- |  |  +-NetworkHelper.java (restful interface for all other needs)
- |  |  +-MainActivity.java (main activity that allows navigation to other activities)
- |  |  +-RegisterActivity.java (activity that allows registering a user)
- |  |  +-CameraActivity.java (activity that allows camera access)
- |  |  +-LoginActivity.java (activity that allows a user to log in)
+ |  |  +-AppLifecycleHandler.java
+ |  |  +-DataStorage.java
+ |  |  +-DeviceLocationActivity.java
+ |  |  +-FriendRequestAdapter.java
+ |  |  +-FriendRequestActivity.java
+ |  |  +-FriendsActivity.java
+ |  |  +-FriendsListAdapter.java
+ |  |  +-HomeActivity.java
+ |  |  +-MainActivity.java
+ |  |  +-MainApplication.java
+ |  |  +-NetworkHelper.java
+ |  |  +-Notifications.java
+ |  |  +-RegisterActivity.java
+ |  |  
+ |  |
+ |  +-java/net/noconroy/itproject/application(test) (Unit Tests)  
+ |  |  |
+ |  |  +-CameraFragmentTest.java
+ |  |  +-ChatHelperUnitTest.javano
+ |  |  +-CompassViewUnitTest.java
+ |  |  +-FriendFunctionalityUnitTest.javano
+ |  |  +-LocationCompareUnitTest.java
+ |  |  +-NetworkHelperUnitTest.java
+ |  |
  |  |
  |  +-res (contains files/folders relavant to layout/presentation)
  |     |
+ |     +-drawable (contains images)
  |     +-layout (determines the visual presentation of a given activity)
  |     +-values (contains values for string and colours)
- |
- +-test/java/net/noconroy/itproject/application/ (contains the testing suites)
- |  |
- |  +-ChatHelperUnitTest.java (the testing suite for the ChatHelper class)
- |  +-NetworkHelperUnitTest.java (the testing suite for the NetworkHelper class)
 
 ```
 
 # Connecting to Server
-Connecting your app to the server is dependent on if your server is setup either remotely or locally, and if you're using an emulator or actual device.
-###### Remote server 
+If you're connecting to the default remote server, connecting is very easy and straightforward.
+Connecting your app to your own server is dependent on if your server is setup either remotely or locally, and if you're using an emulator or actual device.
+###### Default Remote server - EASY OPTION
+Just open the app and use it as usual, you don't have to change any settings or anything like that.
+###### Your Own Remote server 
 Just simply change the SERVER_HOST constant in the NetworkHelper class to the ip address of the server. It does not matter if you are using an emulator or an actual device.
-###### Local server 
+###### Your Own Local server 
 **If you are using an emulator:** Change the SERVER_HOST constant in the NetworkHelper class to 10.0.2.2 if you are using the defualt Android Studio emulator, or 10.0.3.2 if you are using a genymotion emulator. <br/><br/>
 **If you are using a device that is plugged into the machine running localhost:** This still can work, but what you need to do depends on if you're device/machine is connected to wifi/mobile network, what OS your machine is running, and basically what you need to do is quite dependent on your specific setup. So for this reason, this method is not recommended unless you're an advanced user, but if you still wish to do this, it is still quite achievable and there are resources out there on the internet on how this can be done.
 
