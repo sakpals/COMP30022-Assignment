@@ -52,7 +52,7 @@
             android:theme="@style/AppNoTitleBar"></activity>
         <activity
             android:name=".Chat.ChatActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".FriendsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
