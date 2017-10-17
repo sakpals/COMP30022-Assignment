@@ -30,6 +30,8 @@ public class FriendRequestsActivity extends AppCompatActivity {
     private String access_token = null;
     private ListView requests;
     private FriendRequestAdapter customAdapter;
+    private Button updateBtn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,13 @@ public class FriendRequestsActivity extends AppCompatActivity {
         this.requests = (ListView) findViewById(R.id.FriendRequests);
 
         showFriendRequests();
+        updateBtn = (Button) findViewById(R.id.UpdateFriendRequestsButton);
+        updateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showFriendRequests();
+            }
+        });
 
     }
 
